@@ -1,0 +1,47 @@
+@import "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css";
+
+.card-body > .row + .row {
+	margin-top: 40px;
+}
+
+.card {
+	margin-top: 15px;
+	margin-bottom: 15px;
+}
+
+#chart-wrapper {
+	aspect-ratio: 3 / 1;
+}
+
+textarea {
+	min-height: 150px !important;
+}
+
+.del-row {
+	cursor: pointer;
+}
+
+.form-check + .form-check {
+	margin-top: 15px;
+}
+
+#logos {
+	text-align: center;
+}
+
+#logos img {
+	width: 150px;
+	max-width: 32%;
+}
+
+#logos img + img {
+	padding: 20px;
+}
+
+#footer {
+	margin-top: 32px;
+}
+
+#footer .row + .row {
+	margin-top: initial;
+}
