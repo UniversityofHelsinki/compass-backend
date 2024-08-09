@@ -6,7 +6,6 @@ const helmet = require('helmet');
 const path = require("path");
 const cors = require('cors');
 const routes = require('./api/routes');
-const personsRoute = require('./models/persons');
 
 app.use(
     cors({
