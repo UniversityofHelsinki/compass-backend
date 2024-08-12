@@ -10,6 +10,8 @@ stages:
 
 install_dependencies:
   stage: install
+  tags:
+    - ohtu-build-4
   script:
     - npm ci
     - zip -r package.zip .
@@ -19,6 +21,8 @@ install_dependencies:
 
 
 deploy_azure:
+  tags:
+    - ohtu-build-4
   stage: deploy
   image: microsoft/azure-cli
   script:
