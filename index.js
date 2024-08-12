@@ -24,7 +24,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 const router = express.Router();
-app.use(express.static('public'), router); // relative path of client-side code
+app.use(express.static('public'), router);
 //app.use('/api', router);
 console.log(`__dirname ${__dirname}`);
 routes(router, __dirname);
