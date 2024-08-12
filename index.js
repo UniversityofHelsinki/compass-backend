@@ -17,8 +17,17 @@ app.use(
     })
 );
 
+let scriptSources = ["'self'", "https://cdn.jsdelivr.net", "https://www.helsinki.fi", "https://commission.europa.eu", "https://beyondbadapples.eu", "https://cdnjs.cloudflare.com"];
+
 app.use(helmet({
-    contentSecurityPolicy: false,
+    //contentSecurityPolicy: false,
+    useDefaults: false,
+    contentSecurityPolicy: {
+    directives: {
+        "script-src": scriptSources,
+            //"style-src": null,
+    },
+},
 }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
