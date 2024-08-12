@@ -13,6 +13,8 @@ install_dependencies:
   tags:
     - ohtu-build-4
   script:
+    - apt-get update -y
+    - apt-get install -y zip
     - npm ci
     - zip -r package.zip .
   artifacts:
