@@ -1,0 +1,26 @@
+image: node:latest
+
+cache:
+  paths:
+    - node_modules/
+
+stages:
+  - install
+  - deploy
+
+install_dependencies:
+  stage: install
+  script:
+    - npm ci
+    - zip -r package.zip .
+  artifacts:
+    paths:
+      - package.zip
+
+
+deploy_azure:
+  stage: deploy
+  image: microsoft/azure-cli
+  script:
+    - az login --service-principal -u $AZURE_USERNAME -p $AZURE_PASSWORD --tenant $AZURE_TENANT_ID
+    - az webapp deployment source config-zip --resource-group $AZURE_RESOURCE_GROUP --name $AZURE_APP_NAME --src package.zip
