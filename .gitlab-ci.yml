@@ -2,6 +2,7 @@ image: docker:stable
 
 stages:
   - build
+  - deploy
 
 variables:
   # When you use the dind service, you must instruct Docker to talk with
@@ -42,6 +43,7 @@ deploy_azure:
   tags:
     - ohtu-build-4
   stage: deploy
+  when: manual
   image: mcr.microsoft.com/azure-cli
   script:
     - az login --service-principal -u $AZURE_USERNAME -p $AZURE_PASSWORD --tenant $AZURE_TENANT_ID
