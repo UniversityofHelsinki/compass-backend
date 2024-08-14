@@ -1,11 +1,13 @@
+require('dotenv').config();
 const express = require('express');
-
 const app = express();
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const path = require("path");
 const cors = require('cors');
 const routes = require('./api/routes');
+
+const ipaddress = process.env.AZURE_NODEJS_IP || '127.0.0.1';
 
 app.use(
     cors({
@@ -43,6 +45,6 @@ routes(router, __dirname);
 const port = 8080;
 
 // Start the server
-app.listen(port, () => {
-    console.log(`Node.js HTTP server is running on port ${port}`);
+app.listen(port, ipaddress, () => {
+    console.log(`Node.js HTTP server is running on port ${port} and ip address ${ipaddress}`);
 });
