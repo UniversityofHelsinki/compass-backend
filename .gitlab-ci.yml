@@ -48,4 +48,5 @@ deploy_azure:
   script:
     - az login --service-principal -u $AZURE_USERNAME -p $AZURE_PASSWORD --tenant $AZURE_TENANT_ID
     - az group create --name Self-Reflection-Compass --location northeurope
+    - az container delete --resource-group Self-Reflection-Compass --name compass-backend
     - az container create --resource-group Self-Reflection-Compass --name compass-backend --image quay.io/tike/compass-backend:main --dns-name-label compass-backend-dns --ports 8080
