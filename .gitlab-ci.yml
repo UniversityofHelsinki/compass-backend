@@ -62,6 +62,7 @@ deploy_azure:
   when: manual
   image: mcr.microsoft.com/azure-cli
   script:
+    - apk add --update gettext
     - az login --service-principal -u $AZURE_USERNAME -p $AZURE_PASSWORD --tenant $AZURE_TENANT_ID
     - az group create --name Self-Reflection-Compass --location northeurope
     - envsubst < azure-multi-container.yaml > output.yaml
