@@ -63,9 +63,9 @@ deploy_azure:
   image: mcr.microsoft.com/azure-cli
   before_script:
     - apk update
+    - apk add --update gettext git
     - git clone https://version.helsinki.fi/snippets/77.git
   script:
-    - apk add --update gettext
     - az login --service-principal -u $AZURE_USERNAME -p $AZURE_PASSWORD --tenant $AZURE_TENANT_ID
     - az group create --name Self-Reflection-Compass --location northeurope
     - cd 77
