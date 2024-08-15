@@ -62,7 +62,8 @@ deploy_azure:
   when: manual
   image: mcr.microsoft.com/azure-cli
   before_script:
-    - 'apk update -qq && apk add curl'
+    - 'apk update'
+    - 'apk add curl'
     - 'curl -L https://version.helsinki.fi/-/snippets/77/raw > compass-azure-multi-container.yaml'
   script:
     - apk add --update gettext
