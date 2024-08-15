@@ -50,7 +50,7 @@ build_image_caddy:
     - cd caddy
     - docker build -t compass-caddy-server .
     - echo "Tagging Compass Caddy image..."
-    - docker tag caddy-server quay.io/tike/compass-caddy-server:main
+    - docker tag compass-caddy-server quay.io/tike/compass-caddy-server:main
     - echo "Pushing Caddy image..."
     - docker push quay.io/tike/compass-caddy-server:main
 
