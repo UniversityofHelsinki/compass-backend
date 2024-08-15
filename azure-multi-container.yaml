@@ -28,6 +28,9 @@ properties:
           requests:
             cpu: 1.0
             memoryInGb: 1.5
+        volumeMounts:
+          - name: caddy-certs
+            mountPath: /data
   osType: Linux
   restartPolicy: Always
   ipAddress:
@@ -36,3 +39,9 @@ properties:
     ports:
       - protocol: tcp
         port: 443
+  volumes:
+    - name: caddy-certs
+      azureFile:
+        shareName: certs
+        storageAccountName: selfreflectioncompass
+        storageAccountKey: ${STORAGE_ACCOUNT_KEY}
