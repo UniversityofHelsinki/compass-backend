@@ -62,14 +62,15 @@ deploy_azure:
   when: manual
   image: mcr.microsoft.com/azure-cli
   before_script:
-    - 'apk update'
-    - 'apk add curl'
-    - 'curl -L https://version.helsinki.fi/-/snippets/77/raw > compass-azure-multi-container.yaml'
+    - apk update
+    - apk add curl
+    - curl -L https://version.helsinki.fi/-/snippets/77/raw -o compass-azure-multi-container.yaml
   script:
     - apk add --update gettext
     - az login --service-principal -u $AZURE_USERNAME -p $AZURE_PASSWORD --tenant $AZURE_TENANT_ID
     - az group create --name Self-Reflection-Compass --location northeurope
     - envsubst < compass-azure-multi-container.yaml > output.yaml
+    - cat compass-azure-multi-container.yaml
     - az container create --resource-group Self-Reflection-Compass --file output.yaml
     #- az container delete --resource-group Self-Reflection-Compass --name compass-backend --yes
     #- az container create --resource-group Self-Reflection-Compass --name compass-backend --image quay.io/tike/compass-backend:main --dns-name-label compass-backend-dns --ports 8080 --environment-variables AZURE_NODEJS_IP='0.0.0.0'
