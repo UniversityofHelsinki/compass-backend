@@ -39,6 +39,22 @@ build_image:
     - echo "Pushing main image..."
     - docker push quay.io/tike/compass-backend:main
 
+build_image_caddy:
+  stage: build
+  tags:
+    - ohtu-build-4
+  script:
+    - echo "Logging into quay..."
+    - echo $QUAY_PASSWORD | docker login -u $QUAY_USERNAME --password-stdin quay.io
+    - echo "Building Compass Caddy image..."
+    - cd caddy
+    - docker build -t compass-caddy-server .
+    - echo "Tagging Compass Caddy image..."
+    - docker tag caddy-server quay.io/tike/compass-caddy-server:main
+    - echo "Pushing Caddy image..."
+    - docker push quay.io/tike/compass-caddy-server:main
+
+
 deploy_azure:
   tags:
     - ohtu-build-4
@@ -49,4 +65,6 @@ deploy_azure:
     - az login --service-principal -u $AZURE_USERNAME -p $AZURE_PASSWORD --tenant $AZURE_TENANT_ID
     - az group create --name Self-Reflection-Compass --location northeurope
     - az container delete --resource-group Self-Reflection-Compass --name compass-backend --yes
-    - az container create --resource-group Self-Reflection-Compass --name compass-backend --image quay.io/tike/compass-backend:main --dns-name-label compass-backend-dns --ports 8080 --environment-variables AZURE_NODEJS_IP='0.0.0.0'
+    - az container create --resource-group Self-Reflection-Compass --file azure-multi-container.yaml
+    #- az container delete --resource-group Self-Reflection-Compass --name compass-backend --yes
+    #- az container create --resource-group Self-Reflection-Compass --name compass-backend --image quay.io/tike/compass-backend:main --dns-name-label compass-backend-dns --ports 8080 --environment-variables AZURE_NODEJS_IP='0.0.0.0'
