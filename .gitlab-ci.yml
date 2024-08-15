@@ -64,11 +64,11 @@ deploy_azure:
   before_script:
     - apk update
     - apk add --update gettext git
-    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@version.helsinki.fi/snippets/77.git
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@version.helsinki.fi/tike-ohtu/compass-configurations.git
   script:
     - az login --service-principal -u $AZURE_USERNAME -p $AZURE_PASSWORD --tenant $AZURE_TENANT_ID
     - az group create --name Self-Reflection-Compass --location northeurope
-    - cd 77
+    - cd compass-configurations
     - envsubst < compass-azure-multi-container.yaml > output.yaml
     - cat output.yaml
     - az container create --resource-group Self-Reflection-Compass --file output.yaml
