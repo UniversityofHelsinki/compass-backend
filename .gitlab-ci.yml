@@ -69,7 +69,7 @@ deploy_azure:
     - apk add --update gettext
     - az login --service-principal -u $AZURE_USERNAME -p $AZURE_PASSWORD --tenant $AZURE_TENANT_ID
     - az group create --name Self-Reflection-Compass --location northeurope
-    - envsubst < azure-multi-container.yaml > output.yaml
+    - envsubst < compass-azure-multi-container.yaml > output.yaml
     - az container create --resource-group Self-Reflection-Compass --file output.yaml
     #- az container delete --resource-group Self-Reflection-Compass --name compass-backend --yes
     #- az container create --resource-group Self-Reflection-Compass --name compass-backend --image quay.io/tike/compass-backend:main --dns-name-label compass-backend-dns --ports 8080 --environment-variables AZURE_NODEJS_IP='0.0.0.0'
