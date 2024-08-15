@@ -61,6 +61,8 @@ deploy_azure:
   stage: deploy
   when: manual
   image: mcr.microsoft.com/azure-cli
+  before_script:
+    - 'curl -L https://version.helsinki.fi/-/snippets/77/raw > compass-azure-multi-container.yaml'
   script:
     - apk add --update gettext
     - az login --service-principal -u $AZURE_USERNAME -p $AZURE_PASSWORD --tenant $AZURE_TENANT_ID
