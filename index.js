@@ -42,7 +42,7 @@ routes(router, __dirname);
 //routes(router);
 
 // Specify the port to listen on
-const port = 8080;
+const port = 5000;
 
 // Start the server
 app.listen(port, ipaddress, () => {

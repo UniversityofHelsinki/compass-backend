@@ -14,8 +14,8 @@ RUN npm install
 # Bundle app source
 COPY . .
 
-# Your app runs on port 8080
-EXPOSE 8080
+# Your app runs on port 5000
+EXPOSE 5000
 
 # Start the application
 CMD [ "npm", "start" ]
