@@ -1,6 +1,8 @@
 # Use the Node.js Alpine image from the Dockerhub
 FROM node:alpine
 
+RUN apk --no-cache add curl
+
 # Set app directory
 WORKDIR /usr/src/app
 
