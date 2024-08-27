@@ -64,12 +64,12 @@ dependency-check:
     - >
       /usr/share/dependency-check/bin/dependency-check.sh
       --project compass-backend --scan . --enableExperimental
-      --format JSON -nvdApiKey $NVD_API_KEY
+      --format HTML -nvdApiKey $NVD_API_KEY
   artifacts:
     when: always
     expire_in: 1 week
     paths:
-      - dependency-check-report.json
+      - dependency-check-report.html
 
 build_image:
   stage: build
