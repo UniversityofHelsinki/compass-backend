@@ -1,12 +1,8 @@
-const path = require("path");
+require('dotenv').config();
 
-module.exports = (router, rootDir) => {
-    console.log(`eka rootDir ${rootDir}`);
-    /*router.route('/').get((req, res) => {
-        //res.render(path.resolve('../public/index.html'));
-        res.sendFile('index.html', {root : rootDir + '/public'});
-    });*/
-    router.route('/').get(('*', (req, res) => {
-        res.sendFile('index.html', { root: __dirname })
-    }))
-}
+const dbApi = require('../api/dbApi');
+module.exports = function (router) {
+    router.get('/hello', dbApi.getHelloFromDb);
+};
+
+
