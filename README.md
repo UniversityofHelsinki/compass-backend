@@ -1,3 +1,15 @@
+## Installation
+
+After cloning the repository, navigate to the project directory and run:
+npm install
+
+This will install all the necessary dependencies.
+
+## Usage
+Create .env file to host environment variables
+DB_HOST=http://localhost:8000
+
+
 # Node Express template project
 
 This project is based on a GitLab [Project Template](https://docs.gitlab.com/ee/user/project/#create-a-project-from-a-built-in-template).
