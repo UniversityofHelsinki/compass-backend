@@ -17,14 +17,11 @@ const shibbolethAuthentication = (app, passport) => {
     app.use(passport.initialize());
 
     app.use((req, res, next) => {
-        console.log('Middleware hit');
         passport.authenticate('reverseproxy', { session: false }, (err, user, info) => {
             if (err || !user) {
-                console.error('Authentication error or no user found', { err, info });
                 return res.status(403).send('Forbidden');
             }
             req.user = user;
-            console.log("logged user : " , JSON.stringify(user));
             next();
         })(req, res, next);
     });

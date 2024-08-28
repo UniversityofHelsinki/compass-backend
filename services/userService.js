@@ -18,20 +18,14 @@ const getLoggedUser = (user) => {
 };
 
 const logoutUser = (req, res, url) => {
-    req.logout((err) => {
-        if (err) {
-            console.error('Logout error:', err);
-            return res.status(500).json({ error: 'Logout failed' });
-        }
-        if (req.cookies) {
-            Object.keys(req.cookies).forEach(cookie => {
-                if (!cookie.includes(Constants.SHIBBOLETH_COOKIE_NAME)) {
-                    res.clearCookie(cookie);
-                }
-            });
-        }
-        res.redirect(url);
-    });
+    if (req.cookies) {
+        Object.keys(req.cookies).forEach(cookie => {
+            if (!cookie.includes(Constants.SHIBBOLETH_COOKIE_NAME)) {
+                res.clearCookie(cookie);
+            }
+        });
+    }
+    res.redirect(url);
 };
 
 module.exports.logoutUser = logoutUser;

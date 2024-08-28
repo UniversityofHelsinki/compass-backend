@@ -17,6 +17,8 @@ app.use(bodyParser.json());
 
 security.shibbolethAuthentication(app, passport);
 
+console.log(req.user);
+
 const router = express.Router();
 app.use('/api', router);
 routes(router);
