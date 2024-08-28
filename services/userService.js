@@ -1,4 +1,5 @@
 const utf8 = require('utf8');
+const Constants = require("../Constants");
 
 const getLoggedUser = (user) => {
     const eppn = utf8.decode(user.eppn.split('@')[0]);
@@ -16,9 +17,22 @@ const getLoggedUser = (user) => {
     };
 };
 
+const logoutUser = (req, res, url) => {
+    req.logout();
+    if (req.cookies) {
+        Object.keys(req.cookies).forEach(cookie => {
+            if (!cookie.includes(Constants.SHIBBOLETH_COOKIE_NAME)) {
+                res.clearCookie(cookie);
+            }
+        });
+    }
+    res.redirect(url);
+};
+
 const concatenateArray = (data) => Array.prototype.concat.apply([], data);
 
 
 module.exports = {
-    getLoggedUser : getLoggedUser
+    getLoggedUser : getLoggedUser,
+    logoutUser : logoutUser
 };

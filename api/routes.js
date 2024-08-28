@@ -6,6 +6,7 @@ const userApi = require("../api/userApi");
 module.exports = function (router) {
     router.get('/hello', dbApi.getHelloFromDb);
     router.get('/user', userApi.getLoggedUser);
+    router.get('/logout', userApi.logout);
 };
 
 
