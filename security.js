@@ -22,6 +22,7 @@ const shibbolethAuthentication = (app, passport) => {
                 return res.status(403).send('Forbidden');
             }
             req.user = user;
+            console.log("logged user : " , JSON.stringify(user));
             next();
         })(req, res, next);
     });

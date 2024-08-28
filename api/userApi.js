@@ -4,8 +4,11 @@ exports.getLoggedUser = (req, res) => {
 };
 
 exports.logout = (req, res) => {
+    console.log("logout called");
     const action = req.query.action;
     const redirectUrl = req.query.return;
+    console.log(action);
+    console.log(redirectUrl);
     if (action === 'logout') {
         res.json(userService.logoutUser(req, res, redirectUrl));
     }
