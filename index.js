@@ -7,10 +7,12 @@ const routes = require('./api/routes');
 const compression = require('compression');
 const security = require('./security');
 const passport = require('passport');
+const cookieParser = require('cookie-parser');
 
 const ipaddress = process.env.AZURE_NODEJS_IP || '127.0.0.1';
 
 app.use(compression());
+app.use(cookieParser());
 app.use(helmet());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
