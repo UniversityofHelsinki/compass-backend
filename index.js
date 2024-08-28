@@ -5,6 +5,8 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const routes = require('./api/routes');
 const compression = require('compression');
+const security = require('./security');
+const passport = require('passport');
 
 const ipaddress = process.env.AZURE_NODEJS_IP || '127.0.0.1';
 
@@ -12,6 +14,8 @@ app.use(compression());
 app.use(helmet());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+security.shibbolethAuthentication(app, passport);
 
 const router = express.Router();
 app.use('/api', router);

@@ -1,3 +1,13 @@
+## Setting Necessary Headers Locally
+
+When developing or testing the application locally, you need to set the necessary headers to simulate the authentication process handled by Shibboleth in a production environment.
+
+- `eppn`: The unique identifier for the user.
+- `eduPersonAffiliation`: The user's affiliation (optional).
+- `preferredlanguage`: The user's preferred language (optional).
+- `hyGroupCn`: The user's group (optional).
+- `displayName`: The user's display name (optional).
+
 ## Installation
 
 After cloning the repository, navigate to the project directory and run:
