@@ -19,7 +19,7 @@ const shibbolethAuthentication = (app, passport) => {
     app.use((req, res, next) => {
         passport.authenticate('reverseproxy', { session: false }, (err, user, info) => {
             if (err || !user) {
-                return res.status(403).send('Forbidden');
+                return res.status(401).send('Not Authorized');
             }
             req.user = user;
             next();
