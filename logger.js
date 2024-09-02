@@ -1,18 +1,36 @@
 const winston = require('winston');
-const AzureBlobTransport = require('./AzureBlobTransport');
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
 
-const isProduction = process.env.NODE_ENV === 'production';
-const transports = [];
+const logsDir = 'logs'; // The mount path of your Azure File Share in the container
 
-if (isProduction) {
-    transports.push(
-        new AzureBlobTransport({ level: 'error' }),
-        new AzureBlobTransport({ level: 'info' })
-    );
-} else {
-    transports.push(new winston.transports.Console());
+// Ensure logs directory exists
+if (!fs.existsSync(logsDir)) {
+    fs.mkdirSync(logsDir, { recursive: true }, (err) => {
+        if (err) {
+            console.error(`Error creating logs directory: ${err.message}`);
+            process.exit(1);
+        }
+    });
 }
+
+// Function to get log filename with date
+const getLogFileName = (logLevel) => {
+    const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    return path.join(logsDir, `${logLevel}-${date}.log`);
+};
+
+const transports = [
+    new winston.transports.File({
+        filename: getLogFileName('info'),
+        level: 'info'
+    }),
+    new winston.transports.File({
+        filename: getLogFileName('error'),
+        level: 'error'
+    })
+];
 
 const logger = winston.createLogger({
     level: 'info',
@@ -23,14 +41,18 @@ const logger = winston.createLogger({
     transports: transports
 });
 
-// Adding a separate error logger if needed
 const errorLogger = winston.createLogger({
     level: 'error',
     format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.printf(({ timestamp, level, message }) => `${timestamp} - ${level}: ${message}`)
     ),
-    transports: isProduction ? [new AzureBlobTransport({ level: 'error' })] : [new winston.transports.Console()],
+    transports: [
+        new winston.transports.File({
+            filename: getLogFileName('error'),
+            level: 'error'
+        })
+    ]
 });
 
 module.exports = { logger, errorLogger };
