@@ -9,6 +9,7 @@ const security = require('./security');
 const passport = require('passport');
 const cookieParser = require('cookie-parser');
 const cors = require("cors");
+const { logger, errorLogger } = require('./logger');
 
 const ipaddress = process.env.AZURE_NODEJS_IP || '127.0.0.1';
 
@@ -32,5 +33,6 @@ const port = 5000;
 
 // Start the server
 app.listen(port, ipaddress, () => {
-    console.log(`Node.js HTTP server is running on port ${port} and ip address ${ipaddress}`);
+    logger.info(`Node.js HTTP server is running on port ${port} and ip address ${ipaddress}`);
+    errorLogger.error('This is an error message for demonstration.');
 });
