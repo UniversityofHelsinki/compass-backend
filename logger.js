@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
-const logsDir = 'logs'; // The mount path of your Azure File Share in the container
+const logsDir = process.env.LOGS_DIR || 'logs';
 
 // Ensure logs directory exists
 if (!fs.existsSync(logsDir)) {
