@@ -15,6 +15,14 @@ if (!fs.existsSync(logsDir)) {
     });
 }
 
+const azureLogger = winston.createLogger({
+    level: 'info',
+    format: winston.format.json(),
+    transports: [
+        new winston.transports.Console()
+    ]
+});
+
 // Function to get log filename with date
 const getLogFileName = (logLevel) => {
     const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
@@ -55,4 +63,4 @@ const errorLogger = winston.createLogger({
     ]
 });
 
-module.exports = { logger, errorLogger };
+module.exports = { logger, errorLogger, azureLogger };

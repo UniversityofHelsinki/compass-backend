@@ -1,6 +1,7 @@
 const userService = require("../services/userService");
+const {azureLogger} = require("../logger");
 exports.getLoggedUser = (req, res) => {
-    console.log("found user : " , req.user);
+    azureLogger.info("found user : " , req.user);
     res.json(userService.getLoggedUser(req.user));
 };
 
