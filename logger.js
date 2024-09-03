@@ -18,7 +18,7 @@ if (!fs.existsSync(logsDir)) {
 // Function to get log filename with date
 const getLogFileName = (logLevel) => {
     const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-    return path.join(logsDir, `${logLevel}-${date}.log`);
+    return path.join(logsDir, `backend-${logLevel}-${date}.log`);
 };
 
 const transports = [
