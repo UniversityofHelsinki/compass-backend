@@ -1,5 +1,6 @@
 const userService = require("../services/userService");
 exports.getLoggedUser = (req, res) => {
+    console.log("found user : " , req.user);
     res.json(userService.getLoggedUser(req.user));
 };
 
