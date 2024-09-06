@@ -44,7 +44,7 @@ exports.saveAnswer = async (req, res) => {
         return data;
     } catch (error) {
         // Handle any errors that may occur during the fetch
-        console.error('Error fetching hello response:', error);
+        console.error('Error fetching saveAnswer response:', error);
         throw error;
     }
 };
