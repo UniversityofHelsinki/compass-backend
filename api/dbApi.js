@@ -1,4 +1,5 @@
 const dbService = require('../services/dbService');
+const messageKeys = require('../utils/message-keys');
 
 exports.getHelloFromDb = async (req, res) => {
     try {
@@ -14,8 +15,11 @@ exports.saveAnswer = async (req, res) => {
     try {
         const response = await dbService.saveAnswer(req, res);
         res.json(response);
-    } catch(err) {
-        const msg = err.message;
+    } catch(error) {
+        console.error(`Error POST /saveAnswer ${error} USER ${req.user.eppn}`);
         res.status(500);
+        return res.json([{
+            message: messageKeys.ERROR_MESSAGE_FAILED_TO_SAVE_ANSWER
+        }]);
     }
 };
