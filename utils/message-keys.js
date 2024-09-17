@@ -1,8 +1,16 @@
 
 const ERROR_MESSAGE_FAILED_TO_SAVE_ANSWER = 'error-failed-to-save-answer';
 const MESSAGE_ANSWER_SAVED = 'answer-saved';
+const ERROR_MESSAGE_FAILED_TO_ADD_STUDENT = 'error-failed-to-add-student';
+const ERROR_MESSAGE_FAILED_TO_ADD_STUDENT_TO_COURSE = 'error-failed-to-add-student-to-course';
+const ERROR_MESSAGE_STUDENT_CHECKING_IN_COURSE = 'error-student-checking-in-course';
+const ERROR_MESSAGE_STUDENT_EXIST_IN_DATABASE = 'error-student-checking-in-database';
 
 module.exports = {
     ERROR_MESSAGE_FAILED_TO_SAVE_ANSWER,
-    MESSAGE_ANSWER_SAVED
+    MESSAGE_ANSWER_SAVED,
+    ERROR_MESSAGE_FAILED_TO_ADD_STUDENT,
+    ERROR_MESSAGE_FAILED_TO_ADD_STUDENT_TO_COURSE,
+    ERROR_MESSAGE_STUDENT_CHECKING_IN_COURSE,
+    ERROR_MESSAGE_STUDENT_EXIST_IN_DATABASE
 };
