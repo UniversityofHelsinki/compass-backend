@@ -96,7 +96,7 @@ const studentInDatabase = async (req,res) => {
     }
 }
 
-exports.newassignment = async (req, res) => {
+exports.connectstudenttocourse = async (req, res) => {
     try {
         let student_exist = studentInDatabase(req, res);
         if (!student_exist) {

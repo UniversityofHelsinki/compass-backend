@@ -11,7 +11,7 @@ module.exports = function (router) {
     router.post('/addstudenttocourse', dbApi.addstudenttocourse);
     router.post('/addstudent', dbApi.addstudent);
     router.get('/studentExist', dbApi.studentExist);
-    router.post('/newassignment/:course_id', dbApi.newassignment);
+    router.post('/connectstudenttocourse/:course_id', dbApi.connectstudenttocourse);
     router.get('/logout', userApi.logout);
 };
 
