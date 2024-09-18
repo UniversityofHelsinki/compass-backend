@@ -24,10 +24,14 @@ exports.saveAnswer = async (req, res) => {
     }
 };
 
-exports.isstudentincourse = async (req, res) => {
+const isstudentincourse = async (req, res) => {
     try {
         const response = await dbService.isstudentincourse(req, res);
-        res.json(response);
+        return res.json(response);
+        /*db projekti palauttaa messageKeys.STUDENT_IS_IN_COURSE tai messageKeys.STUDENT_NOT_IN_COURSE
+        Toimi SC-48 tiketin mukaan tässä eli tee kaikki operaatiot kutsuen tästä
+        lisää kurssille, lisää opiskelija kantaan jne. req.body pitää sisällään opiskelijan kasitunnuksen ja kurssin id:n
+        tai sit tiedot ovat url:ssa, josta ne saa luettua esim. useSearchParams hookilla.*/
     } catch (error) {
         logger.error(`error checking student in the course`);
         const msg = error.message;
@@ -52,7 +56,7 @@ exports.addstudenttocourse = async (req, res) => {
     }
 }
 
-exports.addstudent = async (req, res) => {
+const addstudent = async (req, res) => {
     try {
         const response = await dbService.addstudent(req, res);
         res.json(response);
@@ -65,7 +69,7 @@ exports.addstudent = async (req, res) => {
     }
 }
 
-exports.studentExist = async (req,res) => {
+const studentExist = async (req,res) => {
     try {
         const response = await dbService.studentExist(req, res);
         res.json(response);
@@ -78,4 +82,31 @@ exports.studentExist = async (req,res) => {
             message: messageKeys.ERROR_MESSAGE_STUDENT_EXIST_IN_DATABASE
         }]);
     }
+}
+
+exports.newassignment = async (req, res) => {
+
+    try {
+        let student_exist = studentExist(req, res);
+        if (!student_exist) {
+            //res.json([{message: messageKeys.STUDENT_NOT_EXIST}]);
+            let studend_added = addstudent(req, res);
+        }
+
+        let student_in_course = isstudentincourse(req, res);
+        if (!student_in_course) {
+            //res.json([{message: messageKeys.STUDENT_NOT_IN_COURSE}]);
+            let response = addstudenttocourse(req, resp);
+            //res.json([{message: messageKeys.STUDENT_ADDED_TO_COURSE}]);
+        }
+    } catch (error) {
+        logger.error(`error adding new assignment`);
+        const msg = error.message;
+        logger.error(`Error POST /newassignment ${error} ${msg}  USER ${req.user.eppn}`);
+        res.status(500);
+        return res.json([{
+            message: messageKeys.ERROR_MESSAGE_STUDENT_CHECKING_IN_COURSE
+        }]);
+    }
+
 }
