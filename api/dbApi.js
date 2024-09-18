@@ -24,7 +24,10 @@ exports.saveAnswer = async (req, res) => {
     }
 };
 
-const isstudentincourse = async (req, res) => {
+exports.isstudentincourse = async (req, res) => {
+        return isStudentInCourse(req, res);
+}
+const isStudentInCourse = async (req, res) => {
     try {
         const response = await dbService.isstudentincourse(req, res);
         return res.json(response);
@@ -44,6 +47,9 @@ const isstudentincourse = async (req, res) => {
 }
 
 exports.addstudenttocourse = async (req, res) => {
+        return addStudentToCourse(req, res);
+}
+const addStudentToCourse = async (req, res) => {
     try {
         const response = await dbService.addstudenttocourse(req, res);
         res.json(response);
@@ -56,7 +62,10 @@ exports.addstudenttocourse = async (req, res) => {
     }
 }
 
-const addstudent = async (req, res) => {
+exports.addstudent = async (req, res) => {
+        return addStudent(req, res);
+}
+const addStudent = async (req, res) => {
     try {
         const response = await dbService.addstudent(req, res);
         res.json(response);
@@ -69,7 +78,10 @@ const addstudent = async (req, res) => {
     }
 }
 
-const studentExist = async (req,res) => {
+exports.studentExist = async (req, res) => {
+        return studentInDatabase(req, res);
+}
+const studentInDatabase = async (req,res) => {
     try {
         const response = await dbService.studentExist(req, res);
         res.json(response);
@@ -85,18 +97,17 @@ const studentExist = async (req,res) => {
 }
 
 exports.newassignment = async (req, res) => {
-
     try {
-        let student_exist = studentExist(req, res);
+        let student_exist = studentInDatabase(req, res);
         if (!student_exist) {
             //res.json([{message: messageKeys.STUDENT_NOT_EXIST}]);
-            let studend_added = addstudent(req, res);
+            let studend_added = addStudent(req, res);
         }
 
-        let student_in_course = isstudentincourse(req, res);
+        let student_in_course = isStudentInCourse(req, res);
         if (!student_in_course) {
             //res.json([{message: messageKeys.STUDENT_NOT_IN_COURSE}]);
-            let response = addstudenttocourse(req, resp);
+            let response = addStudentToCourse(req, resp);
             //res.json([{message: messageKeys.STUDENT_ADDED_TO_COURSE}]);
         }
     } catch (error) {
@@ -108,5 +119,4 @@ exports.newassignment = async (req, res) => {
             message: messageKeys.ERROR_MESSAGE_STUDENT_CHECKING_IN_COURSE
         }]);
     }
-
 }
