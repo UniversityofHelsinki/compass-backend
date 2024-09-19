@@ -1,4 +1,5 @@
 const dbHost = process.env.DB_HOST;
+const { logger } = require('../logger');
 
 exports.getHelloFromBackend = async () => {
     const url = `${dbHost}/api/hello`;
@@ -49,8 +50,8 @@ exports.saveAnswer = async (req, res) => {
     }
 };
 
-exports.isstudentincourse = async (req, res) => {
-    const url = `${dbHost}/api/isstudentincourse`;
+exports.isstudentincourse = async (course_id, student_id) => {
+    const url = `${dbHost}/api/isstudentincourse/${course_id}/${student_id}`;
     try {
         // Wait for the fetch operation to complete
         const response = await fetch(url, {
@@ -73,16 +74,19 @@ exports.isstudentincourse = async (req, res) => {
     }
 }
 
-exports.addstudenttocourse  = async (req, res) => {
+exports.addstudenttocourse  = async (course_id, user_id) => {
     const url = `${dbHost}/api/addstudenttocourse`;
     try {
         // Wait for the fetch operation to complete
+        const course = {"course_id": course_id};
+        const user = {"user_id": user_id};
+        const course_user = {...course, ...user};
         const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(req.body),
+            body: JSON.stringify(course_user)
         });
 
         if (!response.ok) {
@@ -107,7 +111,7 @@ exports.addstudent  = async (req, res) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(req.body),
+            body: JSON.stringify({ user_id: req.user.eppn})
         });
 
         if (!response.ok) {
@@ -123,8 +127,8 @@ exports.addstudent  = async (req, res) => {
     }
 };
 
-exports.studentExist = async (req, res) => {
-    const url = `${dbHost}/api/studentExist`;
+exports.studentExist = async (student_id) => {
+    const url = `${dbHost}/api/studentExist/${student_id}`;
     try {
         // Wait for the fetch operation to complete
         const response = await fetch(url, {

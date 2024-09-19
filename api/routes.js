@@ -7,7 +7,7 @@ module.exports = function (router) {
     router.get('/hello', dbApi.getHelloFromDb);
     router.get('/user', userApi.getLoggedUser);
     router.post('/saveanswer', dbApi.saveAnswer);
-    router.get('/isstudentincourse', dbApi.isstudentincourse);
+    router.get('/isstudentincourse/:course_id/:student_id', dbApi.isstudentincourse);
     router.post('/addstudenttocourse', dbApi.addstudenttocourse);
     router.post('/addstudent', dbApi.addstudent);
     router.get('/studentExist', dbApi.studentExist);
