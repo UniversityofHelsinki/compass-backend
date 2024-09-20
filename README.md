@@ -19,7 +19,6 @@ This will install all the necessary dependencies.
 Create .env.development.local file to host environment variables
 DB_HOST=http://localhost:8000
 ALLOWED_ORIGIN=http://localhost:3000
-NODE_ENV=development
 
 
 # Node Express template project

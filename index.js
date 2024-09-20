@@ -10,9 +10,6 @@ const passport = require('passport');
 const cookieParser = require('cookie-parser');
 const cors = require("cors");
 const { logger } = require('./logger');
-const path = require('path');
-const dotenv = require('dotenv');
-const fs = require('fs');
 
 const ipaddress = process.env.AZURE_NODEJS_IP || '127.0.0.1';
 
