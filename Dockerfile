@@ -14,8 +14,8 @@ RUN npm install
 # Bundle app source
 COPY . .
 
-# Set NODE_ENV environment variable from the build argument. Default to "development" if not provided
-ARG NODE_ENV=development
+# Set NODE_ENV environment variable from the build argument.
+ARG NODE_ENV
 ENV NODE_ENV=$NODE_ENV
 
 # Copy the appropriate .env file based on the build-time ARG
