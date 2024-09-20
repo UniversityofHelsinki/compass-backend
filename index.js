@@ -19,26 +19,18 @@ const ipaddress = process.env.AZURE_NODEJS_IP || '127.0.0.1';
 app.use(compression());
 app.use(cookieParser());
 
-// Load the environment file based on NODE_ENV
-const env = process.env.NODE_ENV || 'development';
-const envFilePath = env === 'development' && fs.existsSync(path.resolve(__dirname, '.env.development.local'))
-    ? '.env.development.local'
-    : `.env.${env}`;
-
-dotenv.config({ path: path.resolve(__dirname, envFilePath) });
-// Get the allowed origin from the environment variable
 const allowedOrigin = process.env.ALLOWED_ORIGIN;
 
 const corsOptions = {
     origin: (origin, callback) => {
-        // Ensure origin is allowed or request is same-origin
+        // Ensure origin is allowed or the request is same-origin
         if (origin === allowedOrigin || !origin) {
             callback(null, true); // Allow the request
         } else {
             callback(new Error('Not allowed by CORS')); // Deny the request
         }
     },
-    optionsSuccessStatus: 200,
+    optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 
 // Apply CORS middleware to the app
