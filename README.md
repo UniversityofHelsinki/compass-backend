@@ -16,7 +16,7 @@ npm install
 This will install all the necessary dependencies.
 
 ## Usage
-Create .env.development.local file to host environment variables
+Create .env file to host environment variables
 DB_HOST=http://localhost:8000
 ALLOWED_ORIGIN=http://localhost:3000
 
