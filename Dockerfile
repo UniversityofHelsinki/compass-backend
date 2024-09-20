@@ -14,13 +14,6 @@ RUN npm install
 # Bundle app source
 COPY . .
 
-# Set NODE_ENV environment variable from the build argument.
-ARG NODE_ENV
-ENV NODE_ENV=$NODE_ENV
-
-# Copy the appropriate .env file based on the build-time ARG
-COPY .env.$NODE_ENV .env
-
 # Your app runs on port 5000
 EXPOSE 5000
 
