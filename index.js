@@ -38,7 +38,7 @@ const corsOptions = {
             callback(new Error('Not allowed by CORS')); // Deny the request
         }
     },
-    optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
+    optionsSuccessStatus: 200,
 };
 
 // Apply CORS middleware to the app
