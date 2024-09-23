@@ -1,24 +1,11 @@
-# Use the Caddy image from Docker Hub
+# Use Caddy server image from Dockerhub
 FROM caddy:2.4.5-alpine
-
-# Create a non-root user and group
-RUN addgroup -S caddygroup && adduser -S caddyuser -G caddygroup
-
-# Set the working directory
-WORKDIR /srv
 
 # Copy the Caddy configuration file
 COPY Caddyfile /etc/caddy/Caddyfile
 
-# Change ownership of the relevant directories to the non-root user
-RUN chown -R caddyuser:caddygroup /srv /etc/caddy
+# Expose ports for Caddy (web server - proxy)
+EXPOSE 80 443
 
-# Switch to the non-root user
-USER caddyuser
-
-# Expose the necessary ports
-EXPOSE 80
-EXPOSE 443
-
-# Run Caddy
+# Start Caddy server
 CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
