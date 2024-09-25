@@ -1,28 +1,31 @@
 # Use the Node.js Alpine image from the Dockerhub
 FROM node:alpine
 
+# Add curl
 RUN apk --no-cache add curl
 
-# Set app directory
+# Create a new user and group
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+# Set the working directory
 WORKDIR /usr/src/app
 
-# Install your app dependencies
+# Install app dependencies
 # Use wildcard to ensure both package.json AND package-lock.json are considered
 COPY package*.json ./
-RUN npm install
+RUN npm install --ignore-scripts
 
 # Bundle app source
 COPY . .
 
-# Set NODE_ENV environment variable from the build argument.
-ARG NODE_ENV
-ENV NODE_ENV=$NODE_ENV
+# Change ownership of the app directory to the new user
+RUN chown -R appuser:appgroup /usr/src/app
 
-# Copy the appropriate .env file based on the build-time ARG
-COPY .env.$NODE_ENV .env
+# Switch to the new user
+USER appuser
 
 # Your app runs on port 5000
 EXPOSE 5000
 
 # Start the application
-CMD [ "npm", "start" ]
+CMD ["npm", "start"]
