@@ -11,7 +11,7 @@ const cookieParser = require('cookie-parser');
 const cors = require("cors");
 const { logger } = require('./logger');
 
-const ipaddress = process.env.AZURE_NODEJS_IP || '127.0.0.1';
+const ipaddress = process.env.AZURE_NODEJS_IP || 'localhost';
 
 app.use(compression());
 app.use(cookieParser());
