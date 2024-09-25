@@ -1,4 +1,4 @@
-# Use the Node.js Alpine image from the Dockerhub
+# Use the Node.js Alpine image from Docker Hub
 FROM node:alpine
 
 # Add curl
