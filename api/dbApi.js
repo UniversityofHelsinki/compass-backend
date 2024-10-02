@@ -1,6 +1,8 @@
 const dbService = require('../services/dbService');
 const messageKeys = require('../utils/message-keys');
 const { logger } = require('../logger');
+const req = require("express/lib/request");
+const res = require("express/lib/response");
 
 exports.getHelloFromDb = async (req, res) => {
     try {
@@ -126,3 +128,46 @@ exports.connectstudenttocourse = async (req, res) => {
         }]);
     }
 }
+
+exports.getUser = async (req) => {
+    let userName = req.user.eppn;
+    return getUserByUsername(userName);
+};
+
+const getUserByUsername = async (user_name) => {
+    try {
+        return await dbService.studentExist(user_name);
+    } catch (error) {
+        logger.error(`error checking for user in the database`);
+        const msg = error.message;
+        logger.error(`Error GET /getUserByUsername ${error} ${msg}  USER ${user_name}`);
+        throw error;
+    }
+};
+
+
+const getCourseForUser= async (user_id) => {
+    try {
+        return await dbService.getCourseForUser(user_id);
+    } catch (error) {
+        logger.error(`Error getting courses for user`);
+        const msg = error.message;
+        logger.error(`Error GET /getCourseForUser ${error} ${msg} USER ${user_id}`);
+        throw error;
+    }
+};
+
+exports.getUserAnswersForCourseId = async (req, res) => {
+    const courseId = req.params.course_id;
+    const userName = req.user.eppn;
+
+    try {
+        const userAnswers = await dbService.getUserAnswersForCourseId(courseId, userName);
+        return res.status(200).json(userAnswers);
+
+    } catch (error) {
+        logger.error(`Error getting user answers for course id: ${error.message}`);
+        logger.error(`Error GET /getUserAnswersForCourseId ${error} USER ${userName} COURSE ${courseId}`);
+        return res.status(500).json({error: error.message });
+    }
+};
