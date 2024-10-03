@@ -10,6 +10,8 @@ const passport = require('passport');
 const cookieParser = require('cookie-parser');
 const cors = require("cors");
 const { logger } = require('./logger');
+const { teacher } = require('./routes/teacher.js');
+const { student } = require('./routes/student.js');
 
 const ipaddress = process.env.AZURE_NODEJS_IP || 'localhost';
 
@@ -41,8 +43,18 @@ app.use(bodyParser.json());
 security.shibbolethAuthentication(app, passport);
 
 const router = express.Router();
+const studentRouter = express.Router();
+const teacherRouter = express.Router();
+
 app.use('/api', router);
 routes(router);
+
+router.use('/student', studentRouter);
+student(studentRouter);
+
+router.use('/teacher', security.teacherConfirmation);
+router.use('/teacher', teacherRouter);
+teacher(teacherRouter);
 
 // Specify the port to listen on
 const port = 5000;
