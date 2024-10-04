@@ -1,57 +1,42 @@
 const dbHost = process.env.DB_HOST;
 const { logger } = require('../logger');
 
-exports.getHelloFromBackend = async () => {
-    const url = `${dbHost}/api/hello`;
-    try {
-        // Wait for the fetch operation to complete
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        // Handle any errors that may occur during the fetch
-        console.error('Error fetching hello response:', error);
-        throw error;
+const dbClient = async (path, options = { method: 'GET' }) => {
+  try {
+    const url = `${dbHost}${path.indexOf('/') !== 0 ? `/${path}` : path}`;
+    const response = await fetch(url, options);
+    if (!response.ok) {
+      throw new Error(`Unexpected status code ${response.status} from ${url}`);
     }
+
+    return await response.json();
+  } catch (error) {
+    console.error(error.message);
+    throw error;
+  }
+
+};
+
+exports.dbClient = dbClient;
+
+exports.getHelloFromBackend = async () => {
+    const url = `/api/hello`;
+    return await dbClient(url);
 };
 
 exports.saveAnswer = async (req, res) => {
     const url = `${dbHost}/api/saveanswer`;
-    try {
-        // Wait for the fetch operation to complete
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(req.body),
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        // Handle any errors that may occur during the fetch
-        console.error('Error fetching saveAnswer response:', error);
-        throw error;
-    }
+    return await dbClient(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(req.body),
+    });
 };
 
-exports.isstudentincourse = async (course_id, student_id) => {
-    const url = `${dbHost}/api/isstudentincourse/${course_id}/${student_id}`;
+exports.isuserincourse = async (course_id, user_id) => {
+    const url = `${dbHost}/api/isuserincourse/${course_id}/${user_id}`;
     try {
         // Wait for the fetch operation to complete
         const response = await fetch(url, {
@@ -69,24 +54,19 @@ exports.isstudentincourse = async (course_id, student_id) => {
         return data;
     } catch (error) {
         // Handle any errors that may occur during the fetch
-        console.error('Error fetching isstudentincourse response:', error);
+        console.error('Error fetching isuserincourse response:', error);
         throw error;
     }
 }
-
-exports.addstudenttocourse  = async (course_id, user_id) => {
-    const url = `${dbHost}/api/addstudenttocourse`;
+exports.connectusertocourse  = async (req, res) => {
+    const url = `${dbHost}/api/connectusertocourse`;
     try {
-        // Wait for the fetch operation to complete
-        const course = {"course_id": course_id};
-        const user = {"user_id": user_id};
-        const course_user = {...course, ...user};
         const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(course_user)
+            body: JSON.stringify(req.body)
         });
 
         if (!response.ok) {
@@ -97,13 +77,13 @@ exports.addstudenttocourse  = async (course_id, user_id) => {
         return data;
     } catch (error) {
         // Handle any errors that may occur during the fetch
-        console.error('Error fetching addstudenttocourse response:', error);
+        console.error('Error fetching connectusertocourse response:', error);
         throw error;
     }
 };
 
-exports.addstudent  = async (req, res) => {
-    const url = `${dbHost}/api/addstudent`;
+exports.addcourse  = async (req, res) => {
+    const url = `${dbHost}/api/addcourse`;
     try {
         // Wait for the fetch operation to complete
         const response = await fetch(url, {
@@ -111,7 +91,7 @@ exports.addstudent  = async (req, res) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ user_id: req.user.eppn})
+            body: JSON.stringify(req.body)
         });
 
         if (!response.ok) {
@@ -122,13 +102,38 @@ exports.addstudent  = async (req, res) => {
         return data;
     } catch (error) {
         // Handle any errors that may occur during the fetch
-        console.error('Error fetching addstudent response:', error);
+        console.error('Error fetching addcourse response:', error);
         throw error;
     }
 };
 
-exports.studentExist = async (student_id) => {
-    const url = `${dbHost}/api/studentExist/${student_id}`;
+exports.adduser  = async (req, res) => {
+    const url = `${dbHost}/api/adduser`;
+    try {
+        // Wait for the fetch operation to complete
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(req.user)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        // Handle any errors that may occur during the fetch
+        console.error('Error fetching adduser response:', error);
+        throw error;
+    }
+};
+
+exports.userExist = async (user_id) => {
+    const url = `${dbHost}/api/userExist/${user_id}`;
     try {
         // Wait for the fetch operation to complete
         const response = await fetch(url, {
@@ -146,7 +151,7 @@ exports.studentExist = async (student_id) => {
         return data;
     } catch (error) {
         // Handle any errors that may occur during the fetch
-        console.error('Error fetching studentExist response:', error);
+        console.error('Error fetching userExist response:', error);
         throw error;
     }
 }

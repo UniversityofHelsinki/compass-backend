@@ -1,8 +1,6 @@
 const dbService = require('../services/dbService');
 const messageKeys = require('../utils/message-keys');
 const { logger } = require('../logger');
-const req = require("express/lib/request");
-const res = require("express/lib/response");
 
 exports.getHelloFromDb = async (req, res) => {
     try {
@@ -27,107 +25,163 @@ exports.saveAnswer = async (req, res) => {
     }
 };
 
-exports.isstudentincourse = async (req, res) => {
+exports.isuserincourse = async (req, res) => {
         let course_id = req.params.course_id;
-        let user_id = req.params.student_id;
-        return isStudentInCourse(req, res, course_id, user_id);
+        let user_id = req.user.eppn;
+        return isUserInCourse(req, res, course_id, user_id);
 }
-const isStudentInCourse = async (course_id, student_id) => {
+const isUserInCourse = async (req, res, course_id, user_id) => {
     try {
-        return await dbService.isstudentincourse(course_id, student_id);
-        /*db projekti palauttaa messageKeys.STUDENT_IS_IN_COURSE tai messageKeys.STUDENT_NOT_IN_COURSE
-        Toimi SC-48 tiketin mukaan tässä eli tee kaikki operaatiot kutsuen tästä
-        lisää kurssille, lisää opiskelija kantaan jne. req.body pitää sisällään opiskelijan kasitunnuksen ja kurssin id:n
-        tai sit tiedot ovat url:ssa, josta ne saa luettua esim. useSearchParams hookilla.*/
+        return await dbService.isuserincourse(course_id, user_id);
     } catch (error) {
-        logger.error(`error checking student in the course`);
+        logger.error(`error checking user in the course`);
         const msg = error.message;
-        logger.error(`Error GET /isstudentincourse ${error} ${msg}  STUDENT ${student_id}`);
+        logger.error(`Error GET /isuserincourse ${error} ${msg}  USER ${user_id}`);
         res.status(500);
-        return res.json([{
-            message: messageKeys.ERROR_MESSAGE_STUDENT_CHECKING_IN_COURSE
+        res.json([{
+            message: messageKeys.ERROR_MESSAGE_USER_CHECKING_IN_COURSE
         }]);
     }
 }
 
-exports.addstudenttocourse = async (req, res) => {
-    let course_id = req.params.course_id;
-    let student_id = req.user.eppn;
-        return addStudentToCourse(course_id, student_id);
+exports.addusertocourse = async (req, res) => {
+    return addUserToCourse(req, res);
 }
-const addStudentToCourse = async (course_id, student_id) => {
+const addUserToCourse = async (req, res) => {
     try {
-        return await dbService.addstudenttocourse(course_id, student_id);
+        return await dbService.connectusertocourse(req, res);
     } catch(error) {
-        console.error(`Error POST /addstudenttocourse ${error} USER ${student_id}`);
+        console.error(`Error POST /addUserToCourse ${error} USER ${req.user.eppn}`);
+        res.status(500);
+        res.json([{
+            message: messageKeys.ERROR_MESSAGE_FAILED_TO_ADD_USER_TO_COURSE
+        }]);
+    }
+}
+exports.addcourse = async (req, res) => {
+        return addCourse(req, res);
+}
+const addCourse = async (req, res) => {
+    try {
+        return await dbService.addcourse(req, res);
+    } catch(error) {
+        console.error(`Error POST /addcourse ${error} USER ${req.user.eppn}`);
         res.status(500);
         return res.json([{
-            message: messageKeys.ERROR_MESSAGE_FAILED_TO_ADD_STUDENT_TO_COURSE
+            message: messageKeys.ERROR_MESSAGE_FAILED_TO_ADD_COURSE
         }]);
     }
 }
 
-exports.addstudent = async (req, res) => {
-        return addStudent(req, res);
+exports.adduser = async (req, res) => {
+        return addUser(req, res);
 }
-const addStudent = async (req, res) => {
+const addUser = async (req, res) => {
     try {
-        return await dbService.addstudent(req, res);
+        return await dbService.adduser(req, res);
     } catch(error) {
         const msg = error.message;
-        logger.error(`Error POST /addstudent ${error}  ${msg} USER ${req.user.eppn}`);
+        logger.error(`Error POST /adduser ${error}  ${msg} USER ${req.user.eppn}`);
         throw error;
     }
 }
 
-exports.studentExist = async (req, res) => {
-    let student_id = req.user.eppn;
-    return studentInDatabase(student_id);
+exports.userExist = async (req, res) => {
+    let user_id = req.user.eppn;
+    return userInDatabase(user_id);
 }
-const studentInDatabase = async (student_id) => {
+const userInDatabase = async (user_id) => {
     try {
-        return await dbService.studentExist(student_id);
+        return await dbService.userExist(user_id);
     } catch (error) {
-        logger.error(`error checking student in the database`);
+        logger.error(`error checking user in the database`);
         const msg = error.message;
-        logger.error(`Error GET /studentExist ${error} ${msg}  USER ${student_id}`);
+        logger.error(`Error GET /userInDatabase ${error} ${msg}  USER ${user_id}`);
         throw error;
     }
 }
 
-exports.connectstudenttocourse = async (req, res) => {
+exports.connectusertocourse = async (req, res) => {
     try {
-        let course_id = req.params.course_id;
-        let student_id = req.user.eppn;
-        let student_exist = await studentInDatabase(student_id);
-        if (student_exist.length === 1 && student_exist[0]?.message === messageKeys.STUDENT_NOT_EXIST) {
-            //res.json([{message: messageKeys.STUDENT_NOT_EXIST}]);
-            let studend_added = await addStudent(req, res);
-            if (studend_added.length === 1 && studend_added[0]?.message !== messageKeys.STUDENT_ADDED) {
-                throw new Error(`Error POST /newassignment student not found, but failed to add in the database, USER ${req.user.eppn}`)
+        let user_id = req.user.eppn;
+        let user_exist = await userInDatabase(user_id);
+        if (user_exist?.message === messageKeys.USER_NOT_EXIST) {
+            let user_added = await addUser(req, res);
+            if (user_added?.message !== messageKeys.USER_ADDED) {
+                return;
+                //res.status(500);
+                //return res.json([{
+                //    message: messageKeys.ERROR_MESSAGE_FAILED_TO_ADD_USER
+                //}]);
+                //throw new Error(`Error POST /connectusertocourse user not found, but failed to add in the database, USER ${req.user.eppn}`)
             }
         }
-
-        let student_in_course = await isStudentInCourse(course_id, student_id);
-        if (student_in_course.length === 1 && student_in_course[0]?.message === messageKeys.STUDENT_NOT_IN_COURSE) {
-            //res.json([{message: messageKeys.STUDENT_NOT_IN_COURSE}]);
-            let studend_to_course_added = await addStudentToCourse(course_id, student_id);
-            //res.json([{message: messageKeys.STUDENT_ADDED_TO_COURSE}]);
-            if (studend_to_course_added.length === 1 && studend_to_course_added[0]?.message !== messageKeys.STUDENT_ADDED_TO_COURSE) {
-                throw new Error(`Error POST /newassignment student not found in course, but failed to add in the database, USER ${req.user.eppn}`)
+        let data = req.body;
+        let course_id = data.course_id;
+        //let eduPersonAffiliation = req.user.eduPersonAffiliation;
+        let user_in_course = await isUserInCourse(course_id, user_id);
+        if (user_in_course?.message === messageKeys.USER_NOT_IN_COURSE) {
+            let user_to_course_added = await addUserToCourse(req, res);
+            if (user_to_course_added?.message !== messageKeys.USER_ADDED_TO_COURSE) {
+                return;
+                //res.status(500);
+                //res.json([{
+                //    message: messageKeys.ERROR_MESSAGE_FAILED_TO_ADD_USER_TO_COURSE
+                //}]);
+                //throw new Error(`Error POST / user not found in course, but failed to add, USER ${req.user.eppn}`)
             }
         }
         res.json([{message: messageKeys.ASSIGNMENT_DONE}]);
     } catch (error) {
-        logger.error(`error adding new assignment`);
+        logger.error(`error connectusertocourse`);
         const msg = error.message;
-        logger.error(`Error POST /newassignment ${error} ${msg}  USER ${req.user.eppn}`);
+        logger.error(`Error POST /connectusertocourse ${error} ${msg}  USER ${req.user.eppn}`);
         res.status(500);
         return res.json([{
-            message: messageKeys.ERROR_MESSAGE_STUDENT_CHECKING_IN_COURSE
+            message: messageKeys.ERROR_MESSAGE_FAILED_TO_ADD_USER_TO_COURSE
         }]);
     }
 }
+
+/*exports.addtusertocourse = async (req, res) => {
+    try {
+        //let course_id = req.params.course_id;
+        let user_id = req.user.eppn;
+        let user_exist = await userInDatabase(user_id);
+        if (user_exist?.message === messageKeys.USER_NOT_EXIST) {
+            //res.json([{message: messageKeys.USER_NOT_EXIST}]);
+            let user_added = await addUser(req, res);
+            if (user_added?.message !== messageKeys.USER_ADDED) {
+                throw new Error(`Error POST /newassignment user not found, but failed to add in the database, USER ${req.user.eppn}`)
+            }
+        }
+        let data = req.body;
+        let course_id = data.course_id;
+        let eduPersonAffiliation = req.user.eduPersonAffiliation;
+
+        let user_in_course = await isUserInCourse(course_id, user_id);
+        if (user_in_course?.message === messageKeys.USER_NOT_IN_COURSE) {
+            //res.json([{message: messageKeys.USER_NOT_IN_COURSE}]);
+
+            req.body.user_id = user_id; //user_id added to request body
+
+            let user_to_course_added = await addUserToCourse(req, res);
+            //res.json([{message: messageKeys.USER_ADDED_TO_COURSE}]);
+            if (user_to_course_added?.message !== messageKeys.USER_ADDED_TO_COURSE) {
+                throw new Error(`Error POST /newassignment user not found in course, but failed to add in the database, USER ${req.user.eppn}`)
+            }
+        }
+        res.json([{message: messageKeys.ASSIGNMENT_DONE}]);
+    } catch (error) {
+        logger.error(`error connectusertocourse`);
+        const msg = error.message;
+        logger.error(`Error POST /connectusertocourse ${error} ${msg}  USER ${req.user.eppn}`);
+        res.status(500);
+        return res.json([{
+            message: messageKeys.ERROR_MESSAGE_USER_CHECKING_IN_COURSE
+        }]);
+    }
+}*/
 
 exports.getUser = async (req) => {
     let userName = req.user.eppn;

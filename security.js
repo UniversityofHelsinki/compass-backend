@@ -27,6 +27,19 @@ const shibbolethAuthentication = (app, passport) => {
     });
 };
 
+const teacherConfirmation = (req, res, next) => {
+  const user = req.user;
+  // replace the value faculty with the correct 
+  // one(s) when they are decided
+  const isTeacher = user.eduPersonAffiliation === 'faculty';
+  if (!isTeacher) {
+    res.status(403).json('User is not a teacher.');
+  } else {
+    next();
+  }
+};
+
 module.exports = {
-    shibbolethAuthentication
+  shibbolethAuthentication,
+  teacherConfirmation
 };
