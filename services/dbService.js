@@ -25,7 +25,7 @@ exports.getHelloFromBackend = async () => {
 };
 
 exports.saveAnswer = async (req, res) => {
-    const url = `${dbHost}/api/saveanswer`;
+    const url = `api/student/saveanswer`;
     return await dbClient(url, {
       method: 'POST',
       headers: {

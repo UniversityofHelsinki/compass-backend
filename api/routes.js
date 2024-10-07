@@ -6,7 +6,7 @@ const userApi = require("../api/userApi");
 module.exports = function (router) {
     router.get('/hello', dbApi.getHelloFromDb);
     router.get('/user', userApi.getLoggedUser);
-    router.post('/saveanswer', dbApi.saveAnswer);
+    router.post('/saveAnswer', dbApi.saveAnswer);
     router.get('/isuserincourse/:course_id', dbApi.isuserincourse);
     router.post('/adduser', dbApi.adduser);
     router.get('/userExist', dbApi.userExist);
