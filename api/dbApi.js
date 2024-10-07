@@ -200,17 +200,6 @@ const getUserByUsername = async (user_name) => {
 };
 
 
-const getCourseForUser= async (user_id) => {
-    try {
-        return await dbService.getCourseForUser(user_id);
-    } catch (error) {
-        logger.error(`Error getting courses for user`);
-        const msg = error.message;
-        logger.error(`Error GET /getCourseForUser ${error} ${msg} USER ${user_id}`);
-        throw error;
-    }
-};
-
 exports.getUserAnswersForCourseId = async (req, res) => {
     const courseId = req.params.course_id;
     const userName = req.user.eppn;

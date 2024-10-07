@@ -15,7 +15,6 @@ module.exports = function (router) {
     router.get('/logout', userApi.logout);
     router.get('/getUserAnswersForCourseId/:course_id', dbApi.getUserAnswersForCourseId);
     router.get('/getUser', dbApi.getUser);
-    router.get('/getCourse', dbApi.getCourseForUser);
 };
 
 
