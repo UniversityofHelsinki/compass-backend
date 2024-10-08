@@ -102,6 +102,7 @@ setup:
 
 test:
   stage: test
+  image: quay.io/tike/alpine-oc-node
   tags:
     - ohtu-build-4
   script:
