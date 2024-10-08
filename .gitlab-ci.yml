@@ -24,6 +24,7 @@ variables:
   # `/certs/client` to share between the service and job
   # container, thanks to volume mount from config.toml
   DOCKER_TLS_CERTDIR: "/certs"
+  npm_config_cache: "$CI_PROJECT_DIR/.npm"
 
 # Define a hidden job to be used with extends
 # Better than default to avoid activating cache for all jobs
