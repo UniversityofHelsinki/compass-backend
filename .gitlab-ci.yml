@@ -3,6 +3,7 @@ image: docker:stable
 stages:
   - dependency-check
   - sonarqube-check
+  - test
   - build
   - deploy
 
@@ -70,6 +71,15 @@ dependency-check:
     expire_in: 1 week
     paths:
       - dependency-check-report.html
+
+test:
+  stage: test
+  image: quay.io/tike/alpine-oc-node
+  tags:
+    - ohtu-build-4
+  script:
+    - npm ci
+    - npm run coverage
 
 build_image:
   stage: build
