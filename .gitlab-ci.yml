@@ -25,6 +25,16 @@ variables:
   # container, thanks to volume mount from config.toml
   DOCKER_TLS_CERTDIR: "/certs"
 
+# Define a hidden job to be used with extends
+# Better than default to avoid activating cache for all jobs
+.dependencies_cache:
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - .npm
+    policy: pull
 
 services:
   - docker:dind
