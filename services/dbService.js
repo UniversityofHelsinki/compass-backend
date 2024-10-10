@@ -4,6 +4,7 @@ const { logger } = require('../logger');
 const dbClient = async (path, options = { method: 'GET' }) => {
   try {
     const url = `${dbHost}${path.indexOf('/') !== 0 ? `/${path}` : path}`;
+    console.log(`Calling ${url}`);
     const response = await fetch(url, options);
     if (!response.ok) {
       throw new Error(`Unexpected status code ${response.status} from ${url}`);
@@ -25,7 +26,7 @@ exports.getHelloFromBackend = async () => {
 };
 
 exports.saveAnswer = async (req, res) => {
-    const url = `api/student/saveanswer`;
+    const url = `/api/student/saveAnswer`;
     return await dbClient(url, {
       method: 'POST',
       headers: {
