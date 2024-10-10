@@ -1,7 +1,7 @@
 let ReverseProxyStrategy = require('passport-reverseproxy');
 const ipaddr = require('ipaddr.js');
 const userService = require("./services/userService");
-const constants = require("/utils/constants");
+const constants = require("./utils/constants");
 /**
  * Contains the IP address of the local host.
  *
