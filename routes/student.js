@@ -1,15 +1,29 @@
 const { dbClient } = require('./../services/dbService.js');
+const userService = require("../services/userService");
 
 exports.student = (router) => {
 
-  router.get('/courses/:student', async (req, res) => {
-    const student = req.params.student;
-    res.json(await dbClient(`/api/student/courses/${student}`));
+  router.get('/courses', async (req, res) => {
+    const user = userService.getLoggedUser(req.user);
+    res.json(await dbClient(`/api/student/courses/${user.eppn}`));
   });
 
-  router.get('/courses/:course/assignments/:student', async (req, res) => {
-    const { course, student } = req.params;
-    res.json(await dbClient(`/api/student/courses/${course}/assignments/${student}`));
+  router.get('/courses/:course/assignments', async (req, res) => {
+    const { course } = req.params;
+    const user = userService.getLoggedUser(req.user);
+    res.json(await dbClient(`/api/student/courses/${course}/assignments/${user.eppn}`));
+  });
+
+  router.get('/courses/:course/answers', async (req, res) => {
+    const { course } = req.params;
+    const user = userService.getLoggedUser(req.user);
+    res.json(await dbClient(`/api/student/courses/${course}/answers/${user.eppn}`));
+  });
+
+  router.get('/courses/:course/assignments', async (req, res) => {
+    const { course } = req.params;
+    const user = userService.getLoggedUser(req.user);
+    res.json(await dbClient(`/api/student/courses/${course}/assignments/${user.eppn}`));
   });
 
 };
