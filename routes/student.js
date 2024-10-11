@@ -27,4 +27,14 @@ exports.student = (router) => {
     res.json(await dbClient(`/api/student/course/assignment/${assignment_id}`));
   });
 
+  router.get('/assignment/course/:assignment_id', async (req, res) => {
+    const { assignment_id, student } = req.params;
+    res.json(await dbClient(`/api/student/assignment/course/${assignment_id}`));
+  });
+
+  router.get('/course/assignment/answer/:assignment_id', async (req, res) => {
+    const { assignment_id, student } = req.params;
+    res.json(await dbClient(`/api/student/course/assignment/answer/${assignment_id}`));
+  });
+
 };
