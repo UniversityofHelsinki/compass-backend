@@ -4,6 +4,7 @@ const { logger } = require('../logger');
 const dbClient = async (path, options = { method: 'GET' }) => {
   try {
     const url = `${dbHost}${path.indexOf('/') !== 0 ? `/${path}` : path}`;
+    console.log(`Calling ${url}`);
     const response = await fetch(url, options);
     if (!response.ok) {
       throw new Error(`Unexpected status code ${response.status} from ${url}`);
@@ -155,5 +156,50 @@ exports.userExist = async (user_id) => {
         throw error;
     }
 }
+
+exports.getUserAnswersForCourseId = async (course_id, user_name) => {
+    const url = `${dbHost}/api/getUserAnswersForCourseId/${course_id}/${user_name}`;
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching user answers for course:', error);
+        throw error;
+    }
+};
+
+exports.getStudentAssignmentsForCourse = async (course, assignment, student) => {
+    const url = `${dbHost}/api/getStudentAssignmentsForCourse/${course}/${assignment}/${student}`;
+
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching student assignments for course:', error);
+        throw error;
+    }
+};
 
 
