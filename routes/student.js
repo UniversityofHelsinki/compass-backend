@@ -26,4 +26,29 @@ exports.student = (router) => {
     res.json(await dbClient(`/api/student/courses/${course}/assignments/${user.eppn}`));
   });
 
+  router.get('/answer/:assignment_id/:student', async (req, res) => {
+    const { assignment_id, student } = req.params;
+    res.json(await dbClient(`/api/student/answer/${assignment_id}/${student}`));
+  });
+
+  router.get('/course/:course_id', async (req, res) => {
+    const { course_id } = req.params;
+    res.json(await dbClient(`/api/student/course/${course_id}`));
+  });
+
+  router.get('/course/assignment/:assignment_id', async (req, res) => {
+    const { assignment_id, student } = req.params;
+    res.json(await dbClient(`/api/student/course/assignment/${assignment_id}`));
+  });
+
+  router.get('/assignment/course/:assignment_id', async (req, res) => {
+    const { assignment_id } = req.params;
+    res.json(await dbClient(`/api/student/assignment/course/${assignment_id}`));
+  });
+
+  router.get('/course/assignment/answer/:assignment_id', async (req, res) => {
+    const { assignment_id } = req.params;
+    res.json(await dbClient(`/api/student/course/assignment/answer/${assignment_id}`));
+  });
+
 };
