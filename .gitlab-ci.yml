@@ -1,8 +1,10 @@
 image: docker:stable
 
 stages:
+  - setup
   - dependency-check
   - sonarqube-check
+  - test
   - build
   - deploy
 
@@ -22,7 +24,18 @@ variables:
   # `/certs/client` to share between the service and job
   # container, thanks to volume mount from config.toml
   DOCKER_TLS_CERTDIR: "/certs"
+  npm_config_cache: "$CI_PROJECT_DIR/.npm"
 
+# Define a hidden job to be used with extends
+# Better than default to avoid activating cache for all jobs
+.dependencies_cache:
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - .npm
+    policy: pull
 
 services:
   - docker:dind
@@ -70,6 +83,31 @@ dependency-check:
     expire_in: 1 week
     paths:
       - dependency-check-report.html
+
+# Define the process for setup stage
+setup:
+  stage: setup
+  image: quay.io/tike/alpine-oc-node
+  tags:
+    - ohtu-build-4
+  script:
+    - npm ci
+  extends: .dependencies_cache
+  cache:
+    policy: pull-push
+  artifacts:
+    expire_in: 1h
+    paths:
+      - node_modules
+
+test:
+  stage: test
+  image: quay.io/tike/alpine-oc-node
+  tags:
+    - ohtu-build-4
+  script:
+    - npm run coverage
+  extends: .dependencies_cache
 
 build_image:
   stage: build
