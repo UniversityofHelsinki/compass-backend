@@ -1,11 +1,12 @@
 
 const { dbClient } = require('./../services/dbService.js');
+const userService = require("../services/userService");
 
 exports.teacher = (router) => {
 
-  router.get('/courses/:teacher', async (req, res) => {
-    const teacher = req.params.teacher;
-    res.json(await dbClient(`/api/teacher/courses/${teacher}`));
+  router.get('/courses', async (req, res) => {
+    const user = userService.getLoggedUser(req.user);
+    res.json(await dbClient(`/api/teacher/courses/${user.eppn}`));
   });
 
   router.get('/courses/:course/questions', async (req, res) => {

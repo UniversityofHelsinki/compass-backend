@@ -14,6 +14,7 @@ const ASSIGNMENT_DONE = 'assignment-done';
 const USER_ADDED = 'user-added';
 const USER_ADDED_TO_COURSE = 'user-added-to-course';
 const ADDED_COURSE = 'course-added';
+const ERROR_MESSAGE_FAILED_TO_GET_COURSE_ANSWERS = 'error-failed-to-get-course-answers-for-user';
 
 module.exports = {
     ERROR_MESSAGE_FAILED_TO_SAVE_ANSWER,
@@ -30,5 +31,6 @@ module.exports = {
     ASSIGNMENT_DONE,
     USER_ADDED,
     USER_ADDED_TO_COURSE,
-    ADDED_COURSE
+    ADDED_COURSE,
+    ERROR_MESSAGE_FAILED_TO_GET_COURSE_ANSWERS
 };

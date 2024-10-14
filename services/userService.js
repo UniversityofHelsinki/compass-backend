@@ -2,8 +2,8 @@ const utf8 = require('utf8');
 const Constants = require("../Constants");
 
 const getLoggedUser = (user) => {
-    const eppn = utf8.decode(user.eppn.split('@')[0]);
-    const eduPersonAffiliation = (utf8.decode(user.eduPersonAffiliation).split(';'));
+    const eppn = utf8.decode(user.eppn);
+    const eduPersonAffiliation = concatenateArray(utf8.decode(user.eduPersonAffiliation).split(';'));
     const hyGroupCn = concatenateArray(utf8.decode(user.hyGroupCn).split(';'));
     const preferredLanguage = utf8.decode(user.preferredLanguage);
     const displayName = utf8.decode(user.displayName);
