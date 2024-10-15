@@ -9,9 +9,10 @@ exports.teacher = (router) => {
     res.json(await dbClient(`/api/teacher/courses/${user.eppn}`));
   });
 
-  router.get('/courses/:teacher/:course', async (req, res) => {
-    const { teacher, course } = req.params;
-    res.json(await dbClient(`/api/teacher/courses/${teacher}/${course}`));
+  router.get('/courses/:course', async (req, res) => {
+    const { course } = req.params;
+    const user = userService.getLoggedUser(req.user);
+    res.json(await dbClient(`/api/teacher/courses/${user.eppn}/${course}`));
   });
 
   router.post('/courses', async (req, res) => {
