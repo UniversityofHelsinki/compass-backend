@@ -48,7 +48,14 @@ exports.student = (router) => {
 
   router.get('/course/assignment/answer/:assignment_id', async (req, res) => {
     const { assignment_id } = req.params;
-    res.json(await dbClient(`/api/student/course/assignment/answer/${assignment_id}`));
+    const user = userService.getLoggedUser(req.user);
+    res.json(await dbClient(`/api/student/course/assignment/answer/${assignment_id}/${user.eppn}`));
+  });
+
+  router.get('/user/answer/delete/:assignment_id/:course_id', async (req, res) => {
+    const { assignment_id } = req.params;
+    const { course_id } = req.params;
+    res.json(await dbClient(`/api/student/user/answer/delete/:assignment_id/:course_id}`));
   });
 
 };
