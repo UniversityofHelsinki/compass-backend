@@ -2,7 +2,9 @@ const ReverseProxyStrategy = require('passport-reverseproxy');
 const ipaddr = require('ipaddr.js');
 const userService = require("./services/userService");
 const constants = require("./utils/constants");
+const utf8 = require('utf8');
 
+const concatenateArray = (data) => Array.prototype.concat([], data);
 const decodeUser = (user) => {
     const eppn = utf8.decode(user.eppn);
     const eduPersonAffiliation = concatenateArray(utf8.decode(user.eduPersonAffiliation).split(';'));

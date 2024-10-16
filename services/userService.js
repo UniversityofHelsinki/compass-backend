@@ -12,8 +12,6 @@ const logoutUser = (req, res, url) => {
     res.redirect(url);
 };
 
-const concatenateArray = (data) => [].concat(data);
-
 module.exports = {
     logoutUser : logoutUser
 };
