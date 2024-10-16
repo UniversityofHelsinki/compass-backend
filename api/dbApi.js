@@ -177,3 +177,16 @@ exports.getStudentAssignmentsForCourse = async (req, res) => {
         return res.status(500).json({error: error.message });
     }
 };
+
+exports.deleteStudentAnswer = async (req, res) => {
+    try {
+        const response = await dbService.deleteStudentAnswer(req, res);
+        return res.status(200).json(response);
+    } catch(error) {
+        console.error(`Error POST /deleteStudentAnswer ${error} USER ${req.user.eppn}`);
+        res.status(500);
+        return res.json([{
+            message: messageKeys.ERROR_MESSAGE_FAILED_TO_SAVE_ANSWER
+        }]);
+    }
+};

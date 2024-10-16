@@ -202,4 +202,15 @@ exports.getStudentAssignmentsForCourse = async (course, assignment, student) => 
     }
 };
 
+exports.deleteStudentAnswer = async (req, res) => {
+    const url = `/api/student/deleteStudentAnswer`;
+    return await dbClient(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(req.body),
+    });
+};
+
 
