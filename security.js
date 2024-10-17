@@ -1,7 +1,25 @@
-let ReverseProxyStrategy = require('passport-reverseproxy');
+const ReverseProxyStrategy = require('passport-reverseproxy');
 const ipaddr = require('ipaddr.js');
 const userService = require("./services/userService");
 const constants = require("./utils/constants");
+const utf8 = require('utf8');
+
+const concatenateArray = (data) => Array.prototype.concat([], data);
+const decodeUser = (user) => {
+    const eppn = utf8.decode(user.eppn);
+    const eduPersonAffiliation = concatenateArray(utf8.decode(user.eduPersonAffiliation).split(';'));
+    const hyGroupCn = concatenateArray(utf8.decode(user.hyGroupCn).split(';'));
+    const preferredLanguage = utf8.decode(user.preferredLanguage);
+    const displayName = utf8.decode(user.displayName);
+    return {
+        eppn: eppn,
+        eduPersonAffiliation: eduPersonAffiliation,
+        hyGroupCn: hyGroupCn,
+        preferredLanguage: preferredLanguage,
+        displayName: displayName
+    };
+};
+
 /**
  * Contains the IP address of the local host.
  *
@@ -43,10 +61,11 @@ const shibbolethAuthentication = (app, passport) => {
             if (err || !user) {
                 return res.status(401).send('Not Authorized');
             }
-            req.user = user;
+            req.user = decodeUser(user);
             next();
         })(req, res, next);
     });
+
 };
 
 /**
@@ -62,7 +81,7 @@ const shibbolethAuthentication = (app, passport) => {
  * @param {Function} next - The next middleware function in the stack.
  */
 const teacherConfirmation = (req, res, next) => {
-   const user = userService.getLoggedUser(req.user);
+   const user = req.user;
    const isTeacher = user.eduPersonAffiliation.includes(constants.ROLE_TEACHER);
   if (!isTeacher) {
     res.status(403).json('User is not a teacher.');
