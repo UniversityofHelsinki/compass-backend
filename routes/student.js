@@ -49,7 +49,7 @@ exports.student = (router) => {
 
   router.get('/course/assignment/answer/:assignment_id/:course', async (req, res) => {
     const { assignment_id, course } = req.params;
-    const user = userService.getLoggedUser(req.user);
+    const user = req.user;
     res.json(await dbClient(`/api/student/course/assignment/answer/${assignment_id}/${user.eppn}/${course}`));
   });
 
