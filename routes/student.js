@@ -1,4 +1,5 @@
 const { dbClient } = require('./../services/dbService.js');
+const dbApi = require("../api/dbApi");
 
 exports.student = (router) => {
 
@@ -45,10 +46,12 @@ exports.student = (router) => {
     res.json(await dbClient(`/api/student/assignment/course/${assignment_id}`));
   });
 
-  router.get('/course/assignment/answer/:assignment_id', async (req, res) => {
-    const { assignment_id } = req.params;
+  router.get('/course/assignment/answer/:assignment_id/:course', async (req, res) => {
+    const { assignment_id, course } = req.params;
     const user = req.user;
-    res.json(await dbClient(`/api/student/course/assignment/answer/${assignment_id}/${user.eppn}`));
+    res.json(await dbClient(`/api/student/course/assignment/answer/${assignment_id}/${user.eppn}/${course}`));
   });
+
+  router.post('/deleteAnswer', dbApi.deleteStudentAnswer);
 
 };
