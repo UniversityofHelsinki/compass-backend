@@ -2,7 +2,7 @@ const userService = require("../services/userService");
 const {logger} = require("../logger");
 exports.getLoggedUser = (req, res) => {
     logger.info("found user : " , req.user);
-    res.json(userService.getLoggedUser(req.user));
+    res.json(req.user);
 };
 
 exports.logout = (req, res) => {
