@@ -37,7 +37,7 @@ exports.student = (router) => {
   });
 
   router.get('/course/assignment/:assignment_id', async (req, res) => {
-    const { assignment_id, student } = req.params;
+    const { assignment_id } = req.params;
     res.json(await dbClient(`/api/student/course/assignment/${assignment_id}`));
   });
 
