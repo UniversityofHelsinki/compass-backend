@@ -21,7 +21,7 @@ exports.student = (router) => {
 
   router.get('/courses/:course/assignments', async (req, res) => {
     const { course } = req.params;
-    const user = userService.getLoggedUser(req.user);
+    const user = req.user;
     res.json(await dbClient(`/api/student/courses/${course}/assignments/${user.eppn}`));
   });
 
@@ -36,7 +36,7 @@ exports.student = (router) => {
   });
 
   router.get('/course/assignment/:assignment_id', async (req, res) => {
-    const { assignment_id, student } = req.params;
+    const { assignment_id } = req.params;
     res.json(await dbClient(`/api/student/course/assignment/${assignment_id}`));
   });
 
@@ -47,7 +47,7 @@ exports.student = (router) => {
 
   router.get('/course/assignment/answer/:assignment_id', async (req, res) => {
     const { assignment_id } = req.params;
-    const user = userService.getLoggedUser(req.user);
+    const user = req.user;
     res.json(await dbClient(`/api/student/course/assignment/answer/${assignment_id}/${user.eppn}`));
   });
 
