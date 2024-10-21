@@ -1,5 +1,4 @@
 const { dbClient } = require('./../services/dbService.js');
-const userService = require("../services/userService");
 const dbApi = require("../api/dbApi");
 
 exports.student = (router) => {
