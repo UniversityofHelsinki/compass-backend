@@ -6,17 +6,16 @@
   "scripts": {
     "start": "node index.js",
     "test": "jest",
-    "coverage": "jest --coverage"
+    "coverage": "jest --coverage",
+    "prepare": "simple-git-hooks"
   },
   "author": "",
   "license": "ISC",
   "jest": {
     "testEnvironment": "node"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "pretty-quick --staged"
-    }
+  "simple-git-hooks": {
+    "pre-commit": "pretty-quick --staged"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.24.0",
@@ -40,6 +39,6 @@
     "jest": "^29.7.0",
     "prettier": "^3.3.3",
     "pretty-quick": "^4.0.0",
-    "husky": "^9.1.6"
+    "simple-git-hooks": "^2.11.1"
   }
 }
