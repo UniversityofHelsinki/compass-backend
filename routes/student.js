@@ -8,6 +8,11 @@ exports.student = (router) => {
     res.json(await dbClient(`/api/student/courses/${user.eppn}`));
   });
 
+  router.get('/studentCourses', async (req, res) => {
+    const user = req.user;
+    res.json(await dbClient(`/api/student/studentCourses/${user.eppn}`));
+  });
+
   router.get('/courses/:course/assignments', async (req, res) => {
     const { course } = req.params;
     const user = req.user;
