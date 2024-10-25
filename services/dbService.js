@@ -2,20 +2,19 @@ const dbHost = process.env.DB_HOST;
 const { logger } = require('../logger');
 
 const dbClient = async (path, options = { method: 'GET' }) => {
-  try {
-    const url = `${dbHost}${path.indexOf('/') !== 0 ? `/${path}` : path}`;
-    console.log(`Calling ${url}`);
-    const response = await fetch(url, options);
-    if (!response.ok) {
-      throw new Error(`Unexpected status code ${response.status} from ${url}`);
+    try {
+        const url = `${dbHost}${path.indexOf('/') !== 0 ? `/${path}` : path}`;
+        console.log(`Calling ${url}`);
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            throw new Error(`Unexpected status code ${response.status} from ${url}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error(error.message);
+        throw error;
     }
-
-    return await response.json();
-  } catch (error) {
-    console.error(error.message);
-    throw error;
-  }
-
 };
 
 exports.dbClient = dbClient;
@@ -28,11 +27,11 @@ exports.getHelloFromBackend = async () => {
 exports.saveAnswer = async (req, res) => {
     const url = `/api/student/saveAnswer`;
     return await dbClient(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(req.body),
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(req.body),
     });
 };
 
@@ -58,8 +57,8 @@ exports.isuserincourse = async (course_id, user_id) => {
         console.error('Error fetching isuserincourse response:', error);
         throw error;
     }
-}
-exports.connectusertocourse  = async (req, res) => {
+};
+exports.connectusertocourse = async (req, res) => {
     const url = `${dbHost}/api/connectusertocourse`;
     try {
         const response = await fetch(url, {
@@ -67,7 +66,7 @@ exports.connectusertocourse  = async (req, res) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(req.body)
+            body: JSON.stringify(req.body),
         });
 
         if (!response.ok) {
@@ -83,7 +82,7 @@ exports.connectusertocourse  = async (req, res) => {
     }
 };
 
-exports.addcourse  = async (req, res) => {
+exports.addcourse = async (req, res) => {
     const url = `${dbHost}/api/addcourse`;
     try {
         // Wait for the fetch operation to complete
@@ -92,7 +91,7 @@ exports.addcourse  = async (req, res) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(req.body)
+            body: JSON.stringify(req.body),
         });
 
         if (!response.ok) {
@@ -108,29 +107,15 @@ exports.addcourse  = async (req, res) => {
     }
 };
 
-exports.adduser  = async (req, res) => {
-    const url = `${dbHost}/api/adduser`;
-    try {
-        // Wait for the fetch operation to complete
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(req.user)
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        // Handle any errors that may occur during the fetch
-        console.error('Error fetching adduser response:', error);
-        throw error;
-    }
+exports.addUser = async (user) => {
+    const url = `/api/addUser`;
+    return await dbClient(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(user),
+    });
 };
 
 exports.userExist = async (user_id) => {
@@ -155,7 +140,7 @@ exports.userExist = async (user_id) => {
         console.error('Error fetching userExist response:', error);
         throw error;
     }
-}
+};
 
 exports.deleteStudentAnswer = async (req, res) => {
     const url = `/api/student/deleteStudentAnswer`;
@@ -167,5 +152,3 @@ exports.deleteStudentAnswer = async (req, res) => {
         body: JSON.stringify(req.body),
     });
 };
-
-

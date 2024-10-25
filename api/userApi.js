@@ -1,7 +1,9 @@
-const userService = require("../services/userService");
-const {logger} = require("../logger");
-exports.getLoggedUser = (req, res) => {
-    logger.info("found user : " , req.user);
+const userService = require('../services/userService');
+const { logger } = require('../logger');
+const { addUser } = require('./dbApi');
+exports.getLoggedUser = async (req, res) => {
+    logger.info('found user : ', req.user);
+    await addUser(req, res);
     res.json(req.user);
 };
 
