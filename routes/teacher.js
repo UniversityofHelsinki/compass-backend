@@ -1,6 +1,7 @@
 
 const { dbClient } = require('./../services/dbService.js');
 const userService = require("../services/userService");
+const { validate: validateCourse } = require('../validation/course.js');
 
 exports.teacher = (router) => {
 
@@ -16,23 +17,43 @@ exports.teacher = (router) => {
   });
 
   router.post('/courses', async (req, res) => {
-    res.json(await dbClient(`/api/teacher/courses`, {
-      method: 'POST',
-      body: JSON.stringify({ ...req.body, user_name: req.user.eppn }),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }));
+    const course = { ...req.body, user_name: req.user.eppn };
+
+    const validation = await validateCourse(course);
+
+    if (validation.isValid) {
+      res.json(await dbClient(`/api/teacher/courses`, {
+        method: 'POST',
+        body: JSON.stringify(course),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }));
+    } else {
+      res.status(401).json({
+        reason: validation.reason
+      });
+    }
+
   });
 
   router.put('/courses', async (req, res) => {
-    res.json(await dbClient(`/api/teacher/courses`, {
-      method: 'PUT',
-      body: JSON.stringify({ ...req.body, user_name: req.user.eppn }),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }));
+    const course = { ...req.body, user_name: req.user.eppn };
+
+    const validation = await validateCourse(course);
+    if (validation.isValid) {
+      res.json(await dbClient(`/api/teacher/courses`, {
+        method: 'PUT',
+        body: JSON.stringify({ ...req.body, user_name: req.user.eppn }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }));
+    } else {
+      res.status(401).json({
+        reason: validation.reason
+      });
+    }
   });
 
   router.get('/courses/:course/questions', async (req, res) => {
