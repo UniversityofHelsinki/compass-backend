@@ -55,4 +55,9 @@ exports.teacher = (router) => {
         const course = req.params.course;
         res.json(await dbClient(`/api/teacher/statistics/course/${course}`));
     });
+
+    router.get('/assignment/:assignmentId/answers', async (req, res) => {
+        const assignmentId = req.params.assignmentId;
+        res.json(await dbClient(`/api/teacher/assignment/${assignmentId}/answers`));
+    });
 };
