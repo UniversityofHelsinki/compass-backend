@@ -1,20 +1,18 @@
-
 const { dbClient } = require('./../services/dbService.js');
 const userService = require("../services/userService");
 const { validate: validateCourse } = require('../validation/course.js');
 
 exports.teacher = (router) => {
+    router.get('/courses', async (req, res) => {
+        const user = req.user;
+        res.json(await dbClient(`/api/teacher/courses/${user.eppn}`));
+    });
 
-  router.get('/courses', async (req, res) => {
-    const user = req.user;
-    res.json(await dbClient(`/api/teacher/courses/${user.eppn}`));
-  });
-
-  router.get('/courses/:course', async (req, res) => {
-    const { course } = req.params;
-    const user = req.user;
-    res.json(await dbClient(`/api/teacher/courses/${user.eppn}/${course}`));
-  });
+    router.get('/courses/:course', async (req, res) => {
+        const { course } = req.params;
+        const user = req.user;
+        res.json(await dbClient(`/api/teacher/courses/${user.eppn}/${course}`));
+    });
 
   router.post('/courses', async (req, res) => {
     const course = { ...req.body, user_name: req.user.eppn };
@@ -56,19 +54,28 @@ exports.teacher = (router) => {
     }
   });
 
-  router.get('/courses/:course/questions', async (req, res) => {
-    const course = req.params.course;
-    res.json(await dbClient(`/api/teacher/courses/${course}/questions`));
-  });
+    router.get('/courses/:course/questions', async (req, res) => {
+        const course = req.params.course;
+        res.json(await dbClient(`/api/teacher/courses/${course}/questions`));
+    });
 
-  router.get('/courses/:course/assignments', async (req, res) => {
-    const course = req.params.course;
-    res.json(await dbClient(`/api/teacher/courses/${course}/assignments`));
-  });
+    router.get('/courses/:course/assignments', async (req, res) => {
+        const course = req.params.course;
+        res.json(await dbClient(`/api/teacher/courses/${course}/assignments`));
+    });
 
-  router.get('/courses/:course/students', async (req, res) => {
-    const course = req.params.course;
-    res.json(await dbClient(`/api/teacher/courses/${course}/students`));
-  });
+    router.get('/courses/:course/students', async (req, res) => {
+        const course = req.params.course;
+        res.json(await dbClient(`/api/teacher/courses/${course}/students`));
+    });
 
+    router.get('/statistics/course/:course', async (req, res) => {
+        const course = req.params.course;
+        res.json(await dbClient(`/api/teacher/statistics/course/${course}`));
+    });
+
+    router.get('/assignment/:assignmentId/answers', async (req, res) => {
+        const assignmentId = req.params.assignmentId;
+        res.json(await dbClient(`/api/teacher/assignment/${assignmentId}/answers`));
+    });
 };
