@@ -1,6 +1,6 @@
 const { dbClient } = require('./../services/dbService.js');
 const userService = require("../services/userService");
-const { validate: validateCourse } = require('../validation/course.js');
+const { validateNewCourse, validateExistingCourse } = require('../validation/course.js');
 
 exports.teacher = (router) => {
     router.get('/courses', async (req, res) => {
@@ -17,7 +17,7 @@ exports.teacher = (router) => {
   router.post('/courses', async (req, res) => {
     const course = { ...req.body, user_name: req.user.eppn };
 
-    const validation = await validateCourse(course);
+    const validation = await validateNewCourse(course);
 
     if (validation.isValid) {
       res.json(await dbClient(`/api/teacher/courses`, {
@@ -38,7 +38,8 @@ exports.teacher = (router) => {
   router.put('/courses', async (req, res) => {
     const course = { ...req.body, user_name: req.user.eppn };
 
-    const validation = await validateCourse(course);
+    const existingCourse = await dbClient(`/api/teacher/courses/${req.user.eppn}/${course.id}`);
+    const validation = await validateExistingCourse(course, existingCourse);
     if (validation.isValid) {
       res.json(await dbClient(`/api/teacher/courses`, {
         method: 'PUT',
