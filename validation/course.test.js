@@ -1,4 +1,4 @@
-const { validate, validateExistingCourse } = require('./course.js');
+const { validate, validateExistingCourse, validateNewCourse } = require('./course.js');
 
 const dbService = require('../services/dbService.js');
 
@@ -156,6 +156,13 @@ describe.each([[createCourse()]])('Course validation', (course) => {
       expect((await validate({ ...course, start_date: randomLetters(10) })).isValid).toBeFalsy();
       expect((await validate({ ...course, start_date: randomLetters(10) })).reason).toEqual(
         'course_start_date_invalid_date'
+      );
+    });
+
+    test('start date can not be in the past with new courses', async () => {
+      expect((await validateNewCourse({ ...course, start_date: date(-1, new Date()) })).isValid).toBeFalsy();
+      expect((await validateNewCourse({ ...course, start_date: date(-1, new Date()) })).reason).toEqual(
+        'course_start_date_in_the_past'
       );
     });
 

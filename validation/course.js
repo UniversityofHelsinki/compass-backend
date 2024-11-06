@@ -81,7 +81,27 @@ const validate = async (course) => {
 };
 
 const validateNewCourse = async (course) => {
-  return await validate(course);
+  const validation = await validate(course);
+  if (!validation.isValid) {
+    return validation;
+  }
+
+  const today = new Date();
+  today.setHours(0);
+  today.setMinutes(0);
+  today.setSeconds(0);
+  today.setMilliseconds(0);
+  if (new Date(course.start_date) < today) {
+    return {
+      isValid: false,
+      reason: 'course_start_date_in_the_past'
+    };
+  }
+
+  return {
+    isValid: true
+  };
+
 };
 
 const validateExistingCourse = async (course, existingCourse) => {
