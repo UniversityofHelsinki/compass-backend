@@ -170,6 +170,12 @@ const validateExistingCourse = async (course, existingCourse) => {
 
   const pastAssignments = existingAssignments.filter(isPastAssignment);
   for (const pastAssignment of pastAssignments) {
+    if (!modifiedAssignmentIds.includes(pastAssignment.id)) {
+      return {
+        isValid: false,
+        reason: `course_assignment_past_assignment_can_not_be_deleted`
+      }
+    }
     for (const modifiedAssignment of modifiedAssignments) {
       if (pastAssignment.id === modifiedAssignment.id) {
         if (pastAssignment.topic !== modifiedAssignment.topic ||

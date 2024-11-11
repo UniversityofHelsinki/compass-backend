@@ -319,6 +319,27 @@ describe.each([[createCourse()]])('Course validation', (course) => {
 
       });
 
+      test('can not be deleted', async () => {
+        const pastAssignments = [
+          createAssignment(course.id, {
+            start_date: date(-30),
+            end_date: date(-1)
+          })
+        ];
+
+        const existingCourse = { ...course, assignments: [ ...pastAssignments ] };
+        const modifiedCourse = { ...existingCourse, assignments: [ ...pastAssignments ] };
+        modifiedCourse.assignments.splice(0, 1);
+
+        const validation = await validateExistingCourse(modifiedCourse, existingCourse);
+        expect(validation.isValid).toBeFalsy();
+        expect(validation.reason).toEqual(
+          `course_assignment_past_assignment_can_not_be_deleted`
+        );
+
+
+      });
+
     });
 
     describe('future assignment', () => {
