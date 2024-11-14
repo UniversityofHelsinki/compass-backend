@@ -192,7 +192,16 @@ describe.each([[createCourse()]])('Course validation', (course) => {
     expect((await validateExistingCourse(course, differentTeacher)).reason).toEqual(
       'course_existing_course_different_teacher'
     );
-  }),
+  });
+
+  test('Existing course\'s course_id can not change', async () => {
+    const differentCourseId = { ...course, course_id: course.course_id + randomLetters(1) };
+    expect((await validateExistingCourse(course, differentCourseId)).isValid).toBeFalsy();
+    expect((await validateExistingCourse(course, differentCourseId)).reason).toEqual(
+      'course_existing_course_has_different_course_id'
+    );
+  });
+
 
   describe('assignment restrictions', () => {
 
