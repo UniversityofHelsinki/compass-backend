@@ -58,15 +58,19 @@ exports.isuserincourse = async (course_id, user_id) => {
         throw error;
     }
 };
-exports.connectusertocourse = async (req, res) => {
+exports.connectusertocourse = async (user_id, course_id) => {
     const url = `${dbHost}/api/connectusertocourse`;
     try {
+        const params = {
+            user_id: user_id,
+            course_id: course_id,
+        };
         const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(req.body),
+            body: JSON.stringify(params),
         });
 
         if (!response.ok) {
