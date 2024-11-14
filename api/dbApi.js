@@ -85,7 +85,7 @@ let addUser = (exports.addUser = async (user) => {
         return await dbService.addUser(user);
     } catch (error) {
         const msg = error.message;
-        logger.error(`Error POST /adduser ${error}  ${msg} USER ${req.user.eppn}`);
+        logger.error(`Error POST /adduser ${error}  ${msg} USER ${user.eppn}`);
         throw error;
     }
 });
@@ -112,7 +112,7 @@ exports.connectusertocourse = async (req, res) => {
         let user_exist = await userInDatabase(user_id);
         if (user_exist?.message === messageKeys.USER_NOT_EXIST) {
             console.log('User not in database', user_id);
-            let user_added = await addUser(user);
+            let user_added = await addUser(req.user);
             if (user_added?.message !== messageKeys.USER_ADDED) {
                 console.log('User NOT added', user_id);
                 return;
