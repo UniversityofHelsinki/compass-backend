@@ -1,5 +1,6 @@
 const { dbClient } = require('./../services/dbService.js');
 const dbApi = require('../api/dbApi');
+const urlSignerService = require('../services/urlSignerService');
 
 exports.student = (router) => {
     router.get('/courses', async (req, res) => {
@@ -63,9 +64,13 @@ exports.student = (router) => {
 
     router.get('/course/assignment/answer/:course', async (req, res) => {
         const { course } = req.params;
-        //const user = req.user;
-        dbApi.connectusertocourse(req, res);
-        //res.json(await dbClient(`/api/student/course/assignment/answer/${user.eppn}/${course}`));
+        const { signature } = req.query;
+        const originalSignature = urlSignerService.generateSignedUrl(course);
+        if (signature !== originalSignature) {
+            console.log('signature not valid');
+            return res.status(401).json({});
+        }
+        await dbApi.connectusertocourse(req, res);
         res.json(await dbClient(`/api/student/assignments/course/${course}`));
     });
 
