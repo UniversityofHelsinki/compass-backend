@@ -7,7 +7,6 @@ exports.getHelloFromDb = async (req, res) => {
         const response = await dbService.getHelloFromBackend();
         res.json(response);
     } catch (err) {
-        const msg = err.message;
         res.status(500);
     }
 };
@@ -27,12 +26,12 @@ exports.saveAnswer = async (req, res) => {
     }
 };
 
-exports.isuserincourse = async (req, res) => {
+/*exports.isuserincourse = async (req, res) => {
     let course_id = req.params.course_id;
     let user_id = req.user.eppn;
-    return isUserInCourse(req, res, course_id, user_id);
-};
-const isUserInCourse = async (req, res, course_id, user_id) => {
+    return isUserInCourse(course_id, user_id);
+};*/
+const isUserInCourse = async (course_id, user_id) => {
     try {
         return await dbService.isuserincourse(course_id, user_id);
     } catch (error) {
@@ -48,14 +47,14 @@ const isUserInCourse = async (req, res, course_id, user_id) => {
     }
 };
 
-exports.addusertocourse = async (req, res) => {
+/*exports.addusertocourse = async (user_id) => {
     return addUserToCourse(req, res);
-};
-const addUserToCourse = async (req, res) => {
+};*/
+const addUserToCourse = async (user_id, course_id) => {
     try {
-        return await dbService.connectusertocourse(req, res);
+        return await dbService.connectusertocourse(user_id, course_id);
     } catch (error) {
-        console.error(`Error POST /addUserToCourse ${error} USER ${req.user.eppn}`);
+        console.error(`Error POST /addUserToCourse ${error} USER ${user_id} COURSE ${course_id}`);
         res.status(500);
         res.json([
             {
@@ -81,16 +80,15 @@ const addCourse = async (req, res) => {
     }
 };
 
-exports.addUser = async (req, res) => {
+let addUser = (exports.addUser = async (user) => {
     try {
-        const user = req.user;
         return await dbService.addUser(user);
     } catch (error) {
         const msg = error.message;
-        logger.error(`Error POST /adduser ${error}  ${msg} USER ${req.user.eppn}`);
+        logger.error(`Error POST /adduser ${error}  ${msg} USER ${user.eppn}`);
         throw error;
     }
-};
+});
 
 exports.userExist = async (req, res) => {
     let user_id = req.user.eppn;
@@ -109,28 +107,38 @@ const userInDatabase = async (user_id) => {
 
 exports.connectusertocourse = async (req, res) => {
     try {
-        let user_id = req.user.eppn;
+        const { course } = req.params;
+        const user_id = req.user.eppn;
         let user_exist = await userInDatabase(user_id);
         if (user_exist?.message === messageKeys.USER_NOT_EXIST) {
-            let user_added = await addUser(req, res);
+            console.log('User not in database', user_id);
+            let user_added = await addUser(req.user);
             if (user_added?.message !== messageKeys.USER_ADDED) {
+                console.log('User NOT added', user_id);
                 return;
+            } else {
+                console.log('User added', user_id);
             }
+        } else {
+            console.log('User already in database', user_id);
         }
-        let data = req.body;
-        let course_id = data.course_id;
-        let user_in_course = await isUserInCourse(course_id, user_id);
+        let user_in_course = await isUserInCourse(course, user_id);
         if (user_in_course?.message === messageKeys.USER_NOT_IN_COURSE) {
-            let user_to_course_added = await addUserToCourse(req, res);
+            console.log(`User not in course, USER ${user_id} COURSE ${course}`);
+            let user_to_course_added = await addUserToCourse(user_id, course);
             if (user_to_course_added?.message !== messageKeys.USER_ADDED_TO_COURSE) {
-                return;
+                console.log(`User NOT added in the course, USER ${user_id} COURSE ${course}`);
+            } else {
+                console.log(`User added in the course, USER ${user_id} COURSE ${course}`);
             }
         }
-        res.json([{ message: messageKeys.ASSIGNMENT_DONE }]);
+        //res.json([{ message: messageKeys.ASSIGNMENT_DONE }]);
     } catch (error) {
         logger.error(`error connectusertocourse`);
         const msg = error.message;
-        logger.error(`Error POST /connectusertocourse ${error} ${msg}  USER ${req.user.eppn}`);
+        logger.error(
+            `Error POST /connectusertocourse ${error} ${msg}  USER ${req.user.eppn} COURSE ${course}`,
+        );
         res.status(500);
         return res.json([
             {
