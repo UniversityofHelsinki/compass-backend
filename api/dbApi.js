@@ -106,33 +106,32 @@ const userInDatabase = async (user_id) => {
 };
 
 exports.connectusertocourse = async (req, res) => {
+    const { course } = req.params;
+    const user_id = req.user.eppn;
     try {
-        const { course } = req.params;
-        const user_id = req.user.eppn;
         let user_exist = await userInDatabase(user_id);
         if (user_exist?.message === messageKeys.USER_NOT_EXIST) {
-            console.log('User not in database', user_id);
+            logger.error('User not in database', user_id);
             let user_added = await addUser(req.user);
             if (user_added?.message !== messageKeys.USER_ADDED) {
-                console.log('User NOT added', user_id);
+                logger.error('User NOT added', user_id);
                 return;
             } else {
-                console.log('User added', user_id);
+                logger.info('User added', user_id);
             }
         } else {
-            console.log('User already in database', user_id);
+            logger.info('User already in database', user_id);
         }
         let user_in_course = await isUserInCourse(course, user_id);
         if (user_in_course?.message === messageKeys.USER_NOT_IN_COURSE) {
-            console.log(`User not in course, USER ${user_id} COURSE ${course}`);
+            logger.error(`User not in course, USER ${user_id} COURSE ${course}`);
             let user_to_course_added = await addUserToCourse(user_id, course);
             if (user_to_course_added?.message !== messageKeys.USER_ADDED_TO_COURSE) {
-                console.log(`User NOT added in the course, USER ${user_id} COURSE ${course}`);
+                logger.error(`User NOT added in the course, USER ${user_id} COURSE ${course}`);
             } else {
-                console.log(`User added in the course, USER ${user_id} COURSE ${course}`);
+                logger.info(`User added in the course, USER ${user_id} COURSE ${course}`);
             }
         }
-        //res.json([{ message: messageKeys.ASSIGNMENT_DONE }]);
     } catch (error) {
         logger.error(`error connectusertocourse`);
         const msg = error.message;

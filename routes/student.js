@@ -1,6 +1,7 @@
 const { dbClient } = require('./../services/dbService.js');
 const dbApi = require('../api/dbApi');
 const { generateSignedUrl } = require('../security');
+const { logger } = require('../logger');
 
 exports.student = (router) => {
     router.get('/courses', async (req, res) => {
@@ -67,7 +68,7 @@ exports.student = (router) => {
         const { signature } = req.query;
         const originalSignature = generateSignedUrl(course);
         if (signature !== originalSignature) {
-            console.log('signature not valid');
+            logger.error(`signature not valid for course ${course}, user ${req.user.eppn}`);
             return res.status(401).json({});
         }
         await dbApi.connectusertocourse(req, res);
