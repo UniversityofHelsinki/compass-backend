@@ -4,3 +4,5 @@ node_modules
 logs
 .env.development.local
 coverage
+# misc
+.DS_Store
