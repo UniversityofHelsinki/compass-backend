@@ -63,11 +63,9 @@ exports.student = (router) => {
 
     router.get('/course/assignment/answer/:course', async (req, res) => {
         const { course } = req.params;
-        //const user = req.user;
         dbApi.connectusertocourse(req, res);
         const user = req.user;
         res.json(await dbClient(`/api/student/assignments/course/${user.eppn}/${course}`));
-        //res.json(await dbClient(`/api/student/assignments/course/${course}`));
     });
 
     router.post('/deleteAnswer', dbApi.deleteStudentAnswer);
