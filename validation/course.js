@@ -215,7 +215,11 @@ const validateDeletableCourse = async (course, user) => {
   }
 
   const now = new Date();
-  const isOnGoingAssignment = (assignment) => new Date(assignment.start_date) < now && new Date(assignment.end_date) > now;
+  now.setMilliseconds(0);
+  now.setSeconds(0);
+  now.setMinutes(0);
+  now.setHours(0);
+  const isOnGoingAssignment = (assignment) => new Date(assignment.start_date) <= now && new Date(assignment.end_date) >= now;
   const onGoingAssignments = course.assignments.filter(isOnGoingAssignment);
   if (onGoingAssignments.length > 0) {
     return {
