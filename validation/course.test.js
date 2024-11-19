@@ -1,4 +1,4 @@
-const { validate, validateExistingCourse, validateNewCourse } = require('./course.js');
+const { validate, validateExistingCourse, validateNewCourse, validateDeletableCourse } = require('./course.js');
 
 const dbService = require('../services/dbService.js');
 
@@ -185,6 +185,14 @@ describe.each([[createCourse()]])('Course validation', (course) => {
     });
 
   });
+
+  test('Teacher can only delete his own courses', async () => {
+    const differentTeacher = { ...course, user_name: randomLetters(10) };
+    expect((await validateExistingCourse(course, differentTeacher)).isValid).toBeFalsy();
+    expect((await validateExistingCourse(course, differentTeacher)).reason).toEqual(
+      'course_existing_course_different_teacher'
+    );
+  }),
 
   describe('assignment restrictions', () => {
 
@@ -379,6 +387,56 @@ describe.each([[createCourse()]])('Course validation', (course) => {
         const validation = await validateExistingCourse(modifiedCourse, existingCourse);
         expect(validation.isValid).toBeTruthy();
       });
+    });
+
+  });
+
+  describe('course deletion', () => {
+
+    test('course can not have on going assignments', async () => {
+      const onGoingAssignments = [
+        createAssignment(course.id, {
+          start_date: date(-30),
+          end_date: date(30)
+        })
+      ];
+
+      const user = { eppn: randomLetters(10) };
+      const deletableCourse = { ...course, assignments: [ ...onGoingAssignments ], user_name: user.eppn };
+      const validation = await validateDeletableCourse(deletableCourse, user);
+      expect(validation.isValid).toBeFalsy();
+      expect(validation.reason).toEqual(
+        `course_can_not_have_on_going_assignments`
+      );
+    });
+
+    test('having past or future assignments is ok', async () => {
+      const assignments = [
+        createAssignment(course.id, {
+          start_date: date(-30),
+          end_date: date(-1)
+        }),
+        createAssignment(course.id, {
+          start_date: date(1),
+          end_date: date(30)
+        })
+      ];
+
+      const user = { eppn: randomLetters(10) };
+      const deletableCourse = { ...course, assignments, user_name: user.eppn };
+      const validation = await validateDeletableCourse(deletableCourse, user);
+      expect(validation.isValid).toBeTruthy();
+
+    });
+
+    test('deleting teacher must own the course', async () => {
+      const user = { eppn: randomLetters(10) };
+      const deletableCourse = { ...course, user_name: user.eppn };
+      const validation = await validateDeletableCourse(deletableCourse, { eppn: randomLetters(8) });
+      expect(validation.isValid).toBeFalsy();
+      expect(validation.reason).toEqual(
+        `course_different_teacher`
+      );
     });
 
   });

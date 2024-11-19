@@ -111,6 +111,11 @@ const validateExistingCourse = async (course, existingCourse) => {
       isValid: false,
       reason: 'course_existing_course_not_found'
     };
+  } else if (existingCourse.user_name !== course.user_name) {
+    return {
+      isValid: false,
+      reason: 'course_existing_course_different_teacher'
+    };
   }
 
   const validation = await validate(course);
@@ -196,8 +201,36 @@ const validateExistingCourse = async (course, existingCourse) => {
 
 };
 
+const validateDeletableCourse = async (course, user) => {
+  if (course.user_name !== user.eppn) {
+    return {
+      isValid: false,
+      reason: 'course_different_teacher'
+    };
+  }
+
+  const now = new Date();
+  now.setMilliseconds(0);
+  now.setSeconds(0);
+  now.setMinutes(0);
+  now.setHours(0);
+  const isOnGoingAssignment = (assignment) => new Date(assignment.start_date) <= now && new Date(assignment.end_date) >= now;
+  const onGoingAssignments = course.assignments.filter(isOnGoingAssignment);
+  if (onGoingAssignments.length > 0) {
+    return {
+      isValid: false,
+      reason: 'course_can_not_have_on_going_assignments'
+    };
+  }
+
+  return {
+    isValid: true
+  };
+};
+
 module.exports = {
   validate,
   validateExistingCourse,
-  validateNewCourse
+  validateNewCourse,
+  validateDeletableCourse
 };

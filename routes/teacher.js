@@ -1,6 +1,6 @@
 const { dbClient } = require('./../services/dbService.js');
 const userService = require("../services/userService");
-const { validateNewCourse, validateExistingCourse } = require('../validation/course.js');
+const { validateNewCourse, validateExistingCourse, validateDeletableCourse } = require('../validation/course.js');
 
 exports.teacher = (router) => {
     router.get('/courses', async (req, res) => {
@@ -28,7 +28,7 @@ exports.teacher = (router) => {
         }
       }));
     } else {
-      res.status(401).json({
+      res.status(400).json({
         reason: validation.reason
       });
     }
@@ -49,7 +49,31 @@ exports.teacher = (router) => {
         }
       }));
     } else {
-      res.status(401).json({
+      res.status(400).json({
+        reason: validation.reason
+      });
+    }
+  });
+
+  router.delete('/courses', async (req, res) => {
+    if (!req.body.id) {
+      res.status(400).end();
+      return;
+    }
+    const course = { ...req.body, user_name: req.user.eppn };
+    const existingCourse = await dbClient(`/api/teacher/courses/${req.user.eppn}/${course.id}`);
+    const validation = await validateDeletableCourse(existingCourse, req.user);
+    if (validation.isValid) {
+      await dbClient(`/api/teacher/courses`, {
+        method: 'DELETE',
+        body: JSON.stringify({ ...req.body, user_name: req.user.eppn }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      res.status(200).end();
+    } else {
+      res.status(400).json({
         reason: validation.reason
       });
     }
