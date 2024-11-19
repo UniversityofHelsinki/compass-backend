@@ -10,7 +10,10 @@ const dbClient = async (path, options = { method: 'GET' }) => {
             throw new Error(`Unexpected status code ${response.status} from ${url}`);
         }
 
-        return await response.json();
+        const contentType = response.headers.get('Content-Type');
+        if (contentType?.startsWith('application/json')) {
+            return await response.json();
+        }
     } catch (error) {
         console.error(error.message);
         throw error;
