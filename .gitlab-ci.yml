@@ -2,9 +2,9 @@ image: docker:stable
 
 stages:
   - setup
+  - test
   - dependency-check
   - sonarqube-check
-  - test
   - build
 
 variables:
