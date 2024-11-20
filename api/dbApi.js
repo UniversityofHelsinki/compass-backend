@@ -26,11 +26,6 @@ exports.saveAnswer = async (req, res) => {
     }
 };
 
-/*exports.isuserincourse = async (req, res) => {
-    let course_id = req.params.course_id;
-    let user_id = req.user.eppn;
-    return isUserInCourse(course_id, user_id);
-};*/
 const isUserInCourse = async (course_id, user_id) => {
     try {
         return await dbService.isuserincourse(course_id, user_id);
@@ -47,9 +42,6 @@ const isUserInCourse = async (course_id, user_id) => {
     }
 };
 
-/*exports.addusertocourse = async (user_id) => {
-    return addUserToCourse(req, res);
-};*/
 const addUserToCourse = async (user_id, course_id) => {
     try {
         return await dbService.connectusertocourse(user_id, course_id);

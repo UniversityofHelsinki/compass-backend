@@ -12,7 +12,7 @@ const dbClient = async (path, options = { method: 'GET' }) => {
 
         const contentType = response.headers.get('Content-Type');
         if (contentType?.startsWith('application/json')) {
-          return await response.json();
+            return await response.json();
         }
     } catch (error) {
         console.error(error.message);
