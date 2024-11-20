@@ -1,5 +1,7 @@
 const { dbClient } = require('./../services/dbService.js');
 const dbApi = require('../api/dbApi');
+const { generateSignedUrl } = require('../security');
+const { logger } = require('../logger');
 
 exports.student = (router) => {
     router.get('/courses', async (req, res) => {
@@ -63,9 +65,14 @@ exports.student = (router) => {
 
     router.get('/course/assignment/answer/:course', async (req, res) => {
         const { course } = req.params;
-        dbApi.connectusertocourse(req, res);
-        const user = req.user;
-        res.json(await dbClient(`/api/student/assignments/course/${user.eppn}/${course}`));
+        const { signature } = req.query;
+        const originalSignature = generateSignedUrl(course);
+        if (signature !== originalSignature) {
+            logger.error(`signature not valid for course ${course}, user ${req.user.eppn}`);
+            return res.status(401).json({});
+        }
+        await dbApi.connectusertocourse(req, res);
+        res.json(await dbClient(`/api/student/assignments/course/${course}`));
     });
 
     router.post('/deleteAnswer', dbApi.deleteStudentAnswer);

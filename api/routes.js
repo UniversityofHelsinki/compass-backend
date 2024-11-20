@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const dbApi = require('../api/dbApi');
 const userApi = require('../api/userApi');
+const urlSigner = require('../api/urlSigner');
 
 module.exports = function (router) {
     router.get('/hello', dbApi.getHelloFromDb);
@@ -11,4 +12,5 @@ module.exports = function (router) {
     router.get('/userExist', dbApi.userExist);
     router.post('/addcourse', dbApi.addcourse);
     router.get('/logout', userApi.logout);
+    router.get('/getUrlSignature/:courseId', urlSigner.getUrlSignature);
 };
