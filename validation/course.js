@@ -110,6 +110,11 @@ const validateExistingCourse = async (course, existingCourse) => {
             isValid: false,
             reason: 'course_existing_course_different_teacher',
         };
+    } else if (course.course_id !== existingCourse.course_id) {
+        return {
+            isValid: false,
+            reason: 'course_existing_course_has_different_course_id',
+        };
     }
 
     const validation = await validate(course);

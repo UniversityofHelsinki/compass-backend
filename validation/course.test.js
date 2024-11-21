@@ -200,185 +200,194 @@ describe.each([[createCourse()]])('Course validation', (course) => {
         expect((await validateExistingCourse(course, differentTeacher)).reason).toEqual(
             'course_existing_course_different_teacher',
         );
-    }),
-        describe('assignment restrictions', () => {
-            describe('on going assignment', () => {
-                test('can not be deleted', async () => {
-                    const onGoingAssignments = [
-                        createAssignment(course.id),
-                        createAssignment(course.id),
-                    ];
+    });
 
-                    const existingCourse = { ...course, assignments: [...onGoingAssignments] };
+    test("Existing course's course_id can not change", async () => {
+        const differentCourseId = { ...course, course_id: course.course_id + randomLetters(1) };
+        expect((await validateExistingCourse(course, differentCourseId)).isValid).toBeFalsy();
+        expect((await validateExistingCourse(course, differentCourseId)).reason).toEqual(
+            'course_existing_course_has_different_course_id',
+        );
+    });
 
-                    const modifiedCourse = { ...existingCourse, assignments: [] };
+    describe('assignment restrictions', () => {
+        describe('on going assignment', () => {
+            test('can not be deleted', async () => {
+                const onGoingAssignments = [
+                    createAssignment(course.id),
+                    createAssignment(course.id),
+                ];
 
-                    const validation = await validateExistingCourse(modifiedCourse, existingCourse);
+                const existingCourse = { ...course, assignments: [...onGoingAssignments] };
 
-                    expect(validation.isValid).toBeFalsy();
-                    expect(validation.reason).toEqual(
-                        `course_assignment_on_going_assignment_can_not_be_deleted`,
-                    );
-                });
+                const modifiedCourse = { ...existingCourse, assignments: [] };
 
-                test('topic can not be changed', async () => {
-                    const onGoingAssignments = [
-                        createAssignment(course.id),
-                        createAssignment(course.id),
-                    ];
+                const validation = await validateExistingCourse(modifiedCourse, existingCourse);
 
-                    const existingCourse = { ...course, assignments: [...onGoingAssignments] };
-                    const modifiedCourse = { ...course, assignments: [...onGoingAssignments] };
-                    modifiedCourse.assignments[0] = {
-                        ...onGoingAssignments[0],
-                        topic: onGoingAssignments[0].topic + randomLetters(10),
-                    };
-                    const validation = await validateExistingCourse(modifiedCourse, existingCourse);
-
-                    expect(validation.isValid).toBeFalsy();
-                    expect(validation.reason).toEqual(
-                        `course_assignment_on_going_assignment_topic_can_not_be_changed`,
-                    );
-                });
-
-                test('can be extended', async () => {
-                    const onGoingAssignments = [createAssignment(course.id)];
-
-                    const existingCourse = { ...course, assignments: [...onGoingAssignments] };
-                    const modifiedCourse = { ...course, assignments: [...onGoingAssignments] };
-                    const endDate =
-                        new Date(onGoingAssignments[0].end_date).getTime() + 24 * 60 * 60 * 1000;
-                    modifiedCourse.assignments[0] = {
-                        ...onGoingAssignments[0],
-                        end_date: new Date(endDate).toISOString(),
-                    };
-
-                    const validation = await validateExistingCourse(modifiedCourse, existingCourse);
-                    expect(validation.isValid).toBeTruthy();
-                });
-
-                test('can not be shortened with end date', async () => {
-                    const onGoingAssignments = [createAssignment(course.id)];
-
-                    const existingCourse = { ...course, assignments: [...onGoingAssignments] };
-                    const modifiedCourse = { ...course, assignments: [...onGoingAssignments] };
-                    const endDate =
-                        new Date(onGoingAssignments[0].end_date).getTime() - 24 * 60 * 60 * 1000;
-                    modifiedCourse.assignments[0] = {
-                        ...onGoingAssignments[0],
-                        end_date: new Date(endDate).toISOString(),
-                    };
-
-                    const validation = await validateExistingCourse(modifiedCourse, existingCourse);
-                    expect(validation.isValid).toBeFalsy();
-                    expect(validation.reason).toEqual(
-                        `course_assignment_on_going_assignment_can_not_be_shortened`,
-                    );
-                });
-
-                test('can not be shortened with start date', async () => {
-                    const onGoingAssignments = [createAssignment(course.id)];
-
-                    const existingCourse = { ...course, assignments: [...onGoingAssignments] };
-                    const modifiedCourse = { ...course, assignments: [...onGoingAssignments] };
-                    const startDate =
-                        new Date(onGoingAssignments[0].start_date).getTime() + 24 * 60 * 60 * 1000;
-                    modifiedCourse.assignments[0] = {
-                        ...onGoingAssignments[0],
-                        start_date: new Date(startDate).toISOString(),
-                    };
-
-                    const validation = await validateExistingCourse(modifiedCourse, existingCourse);
-                    expect(validation.isValid).toBeFalsy();
-                    expect(validation.reason).toEqual(
-                        `course_assignment_on_going_assignment_can_not_be_shortened`,
-                    );
-                });
+                expect(validation.isValid).toBeFalsy();
+                expect(validation.reason).toEqual(
+                    `course_assignment_on_going_assignment_can_not_be_deleted`,
+                );
             });
 
-            describe('past assignment', () => {
-                test('can not be changed', async () => {
-                    const pastAssignments = [
-                        createAssignment(course.id, {
-                            start_date: date(-30),
-                            end_date: date(-1),
-                        }),
-                    ];
+            test('topic can not be changed', async () => {
+                const onGoingAssignments = [
+                    createAssignment(course.id),
+                    createAssignment(course.id),
+                ];
 
-                    const existingCourse = { ...course, assignments: [...pastAssignments] };
-                    const modifiedCourse = { ...course, assignments: [...pastAssignments] };
+                const existingCourse = { ...course, assignments: [...onGoingAssignments] };
+                const modifiedCourse = { ...course, assignments: [...onGoingAssignments] };
+                modifiedCourse.assignments[0] = {
+                    ...onGoingAssignments[0],
+                    topic: onGoingAssignments[0].topic + randomLetters(10),
+                };
+                const validation = await validateExistingCourse(modifiedCourse, existingCourse);
 
-                    modifiedCourse.assignments[0] = {
-                        ...pastAssignments[0],
-                        topic: pastAssignments[0].topic + randomLetters(10),
-                    };
-
-                    const validation = await validateExistingCourse(modifiedCourse, existingCourse);
-                    expect(validation.isValid).toBeFalsy();
-                    expect(validation.reason).toEqual(
-                        `course_assignment_past_assignment_can_not_be_changed`,
-                    );
-                });
-
-                test('can not be deleted', async () => {
-                    const pastAssignments = [
-                        createAssignment(course.id, {
-                            start_date: date(-30),
-                            end_date: date(-1),
-                        }),
-                    ];
-
-                    const existingCourse = { ...course, assignments: [...pastAssignments] };
-                    const modifiedCourse = { ...existingCourse, assignments: [...pastAssignments] };
-                    modifiedCourse.assignments.splice(0, 1);
-
-                    const validation = await validateExistingCourse(modifiedCourse, existingCourse);
-                    expect(validation.isValid).toBeFalsy();
-                    expect(validation.reason).toEqual(
-                        `course_assignment_past_assignment_can_not_be_deleted`,
-                    );
-                });
+                expect(validation.isValid).toBeFalsy();
+                expect(validation.reason).toEqual(
+                    `course_assignment_on_going_assignment_topic_can_not_be_changed`,
+                );
             });
 
-            describe('future assignment', () => {
-                test('can be changed', async () => {
-                    const futureAssignments = [
-                        createAssignment(course.id, {
-                            start_date: date(1),
-                            end_date: date(30),
-                        }),
-                    ];
+            test('can be extended', async () => {
+                const onGoingAssignments = [createAssignment(course.id)];
 
-                    const existingCourse = { ...course, assignments: [...futureAssignments] };
-                    const modifiedCourse = { ...course, assignments: [...futureAssignments] };
+                const existingCourse = { ...course, assignments: [...onGoingAssignments] };
+                const modifiedCourse = { ...course, assignments: [...onGoingAssignments] };
+                const endDate =
+                    new Date(onGoingAssignments[0].end_date).getTime() + 24 * 60 * 60 * 1000;
+                modifiedCourse.assignments[0] = {
+                    ...onGoingAssignments[0],
+                    end_date: new Date(endDate).toISOString(),
+                };
 
-                    modifiedCourse.assignments[0] = {
-                        ...futureAssignments[0],
-                        topic: futureAssignments[0].topic + randomLetters(10),
-                        start_date: date(20),
-                        end_date: date(60),
-                    };
+                const validation = await validateExistingCourse(modifiedCourse, existingCourse);
+                expect(validation.isValid).toBeTruthy();
+            });
 
-                    const validation = await validateExistingCourse(modifiedCourse, existingCourse);
-                    expect(validation.isValid).toBeTruthy();
-                });
+            test('can not be shortened with end date', async () => {
+                const onGoingAssignments = [createAssignment(course.id)];
 
-                test('can be deleted', async () => {
-                    const futureAssignments = [
-                        createAssignment(course.id, {
-                            start_date: date(1),
-                            end_date: date(30),
-                        }),
-                    ];
+                const existingCourse = { ...course, assignments: [...onGoingAssignments] };
+                const modifiedCourse = { ...course, assignments: [...onGoingAssignments] };
+                const endDate =
+                    new Date(onGoingAssignments[0].end_date).getTime() - 24 * 60 * 60 * 1000;
+                modifiedCourse.assignments[0] = {
+                    ...onGoingAssignments[0],
+                    end_date: new Date(endDate).toISOString(),
+                };
 
-                    const existingCourse = { ...course, assignments: [...futureAssignments] };
-                    const modifiedCourse = { ...course, assignments: [] };
+                const validation = await validateExistingCourse(modifiedCourse, existingCourse);
+                expect(validation.isValid).toBeFalsy();
+                expect(validation.reason).toEqual(
+                    `course_assignment_on_going_assignment_can_not_be_shortened`,
+                );
+            });
 
-                    const validation = await validateExistingCourse(modifiedCourse, existingCourse);
-                    expect(validation.isValid).toBeTruthy();
-                });
+            test('can not be shortened with start date', async () => {
+                const onGoingAssignments = [createAssignment(course.id)];
+
+                const existingCourse = { ...course, assignments: [...onGoingAssignments] };
+                const modifiedCourse = { ...course, assignments: [...onGoingAssignments] };
+                const startDate =
+                    new Date(onGoingAssignments[0].start_date).getTime() + 24 * 60 * 60 * 1000;
+                modifiedCourse.assignments[0] = {
+                    ...onGoingAssignments[0],
+                    start_date: new Date(startDate).toISOString(),
+                };
+
+                const validation = await validateExistingCourse(modifiedCourse, existingCourse);
+                expect(validation.isValid).toBeFalsy();
+                expect(validation.reason).toEqual(
+                    `course_assignment_on_going_assignment_can_not_be_shortened`,
+                );
             });
         });
+
+        describe('past assignment', () => {
+            test('can not be changed', async () => {
+                const pastAssignments = [
+                    createAssignment(course.id, {
+                        start_date: date(-30),
+                        end_date: date(-1),
+                    }),
+                ];
+
+                const existingCourse = { ...course, assignments: [...pastAssignments] };
+                const modifiedCourse = { ...course, assignments: [...pastAssignments] };
+
+                modifiedCourse.assignments[0] = {
+                    ...pastAssignments[0],
+                    topic: pastAssignments[0].topic + randomLetters(10),
+                };
+
+                const validation = await validateExistingCourse(modifiedCourse, existingCourse);
+                expect(validation.isValid).toBeFalsy();
+                expect(validation.reason).toEqual(
+                    `course_assignment_past_assignment_can_not_be_changed`,
+                );
+            });
+
+            test('can not be deleted', async () => {
+                const pastAssignments = [
+                    createAssignment(course.id, {
+                        start_date: date(-30),
+                        end_date: date(-1),
+                    }),
+                ];
+
+                const existingCourse = { ...course, assignments: [...pastAssignments] };
+                const modifiedCourse = { ...existingCourse, assignments: [...pastAssignments] };
+                modifiedCourse.assignments.splice(0, 1);
+
+                const validation = await validateExistingCourse(modifiedCourse, existingCourse);
+                expect(validation.isValid).toBeFalsy();
+                expect(validation.reason).toEqual(
+                    `course_assignment_past_assignment_can_not_be_deleted`,
+                );
+            });
+        });
+
+        describe('future assignment', () => {
+            test('can be changed', async () => {
+                const futureAssignments = [
+                    createAssignment(course.id, {
+                        start_date: date(1),
+                        end_date: date(30),
+                    }),
+                ];
+
+                const existingCourse = { ...course, assignments: [...futureAssignments] };
+                const modifiedCourse = { ...course, assignments: [...futureAssignments] };
+
+                modifiedCourse.assignments[0] = {
+                    ...futureAssignments[0],
+                    topic: futureAssignments[0].topic + randomLetters(10),
+                    start_date: date(20),
+                    end_date: date(60),
+                };
+
+                const validation = await validateExistingCourse(modifiedCourse, existingCourse);
+                expect(validation.isValid).toBeTruthy();
+            });
+
+            test('can be deleted', async () => {
+                const futureAssignments = [
+                    createAssignment(course.id, {
+                        start_date: date(1),
+                        end_date: date(30),
+                    }),
+                ];
+
+                const existingCourse = { ...course, assignments: [...futureAssignments] };
+                const modifiedCourse = { ...course, assignments: [] };
+
+                const validation = await validateExistingCourse(modifiedCourse, existingCourse);
+                expect(validation.isValid).toBeTruthy();
+            });
+        });
+    });
 
     describe('course deletion', () => {
         test('course can not have on going assignments', async () => {

@@ -2,11 +2,11 @@
 
 When developing or testing the application locally, you need to set the necessary headers to simulate the authentication process handled by Shibboleth in a production environment.
 
-- `eppn`: The unique identifier for the user.
-- `eduPersonAffiliation`: The user's affiliation (optional).
-- `preferredlanguage`: The user's preferred language (optional).
-- `hyGroupCn`: The user's group (optional).
-- `displayName`: The user's display name (optional).
+-   `eppn`: The unique identifier for the user.
+-   `eduPersonAffiliation`: The user's affiliation (optional).
+-   `preferredlanguage`: The user's preferred language (optional).
+-   `hyGroupCn`: The user's group (optional).
+-   `displayName`: The user's display name (optional).
 
 ## Installation
 
@@ -16,11 +16,11 @@ npm install
 This will install all the necessary dependencies.
 
 ## Usage
+
 Create .env file to host environment variables
 DB_HOST=http://localhost:8000
 ALLOWED_ORIGIN=http://localhost:3000
 URL_SIGNER_KEY=whatever
-
 
 # Node Express template project
 
