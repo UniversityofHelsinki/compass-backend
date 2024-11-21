@@ -1,13 +1,17 @@
 const ReverseProxyStrategy = require('passport-reverseproxy');
 const ipaddr = require('ipaddr.js');
-const userService = require("./services/userService");
-const constants = require("./utils/constants");
+const constants = require('./utils/constants');
 const utf8 = require('utf8');
+const crypto = require('crypto');
+
+const SECRET_KEY = process.env.URL_SIGNER_KEY;
 
 const concatenateArray = (data) => Array.prototype.concat([], data);
 const decodeUser = (user) => {
     const eppn = utf8.decode(user.eppn);
-    const eduPersonAffiliation = concatenateArray(utf8.decode(user.eduPersonAffiliation).split(';'));
+    const eduPersonAffiliation = concatenateArray(
+        utf8.decode(user.eduPersonAffiliation).split(';'),
+    );
     const hyGroupCn = concatenateArray(utf8.decode(user.hyGroupCn).split(';'));
     const preferredLanguage = utf8.decode(user.preferredLanguage);
     const displayName = utf8.decode(user.displayName);
@@ -16,7 +20,7 @@ const decodeUser = (user) => {
         eduPersonAffiliation: eduPersonAffiliation,
         hyGroupCn: hyGroupCn,
         preferredLanguage: preferredLanguage,
-        displayName: displayName
+        displayName: displayName,
     };
 };
 
@@ -43,16 +47,18 @@ const localhostIP = ipaddr.process('127.0.0.1');
  * a 401 Unauthorized response is sent.
  */
 const shibbolethAuthentication = (app, passport) => {
-    passport.use(new ReverseProxyStrategy({
-        headers: {
-            'eppn': { alias: 'eppn', required: true },
-            'eduPersonAffiliation': { alias: 'eduPersonAffiliation', required: false },
-            'preferredlanguage': { alias: 'preferredLanguage', required: false },
-            'hyGroupCn': { alias: 'hyGroupCn', required: false },
-            'displayName': { alias: 'displayName', required: false }
-        },
-        whitelist: localhostIP
-    }));
+    passport.use(
+        new ReverseProxyStrategy({
+            headers: {
+                eppn: { alias: 'eppn', required: true },
+                eduPersonAffiliation: { alias: 'eduPersonAffiliation', required: false },
+                preferredlanguage: { alias: 'preferredLanguage', required: false },
+                hyGroupCn: { alias: 'hyGroupCn', required: false },
+                displayName: { alias: 'displayName', required: false },
+            },
+            whitelist: localhostIP,
+        }),
+    );
 
     app.use(passport.initialize());
 
@@ -65,7 +71,6 @@ const shibbolethAuthentication = (app, passport) => {
             next();
         })(req, res, next);
     });
-
 };
 
 /**
@@ -81,16 +86,26 @@ const shibbolethAuthentication = (app, passport) => {
  * @param {Function} next - The next middleware function in the stack.
  */
 const teacherConfirmation = (req, res, next) => {
-   const user = req.user;
-   const isTeacher = user.eduPersonAffiliation.includes(constants.ROLE_TEACHER);
-  if (!isTeacher) {
-    res.status(403).json('User is not a teacher.');
-  } else {
-    next();
-  }
+    const user = req.user;
+    const isTeacher = user.eduPersonAffiliation.includes(constants.ROLE_TEACHER);
+    if (!isTeacher) {
+        res.status(403).json('User is not a teacher.');
+    } else {
+        next();
+    }
+};
+
+const generateSignature = (data) => {
+    return crypto.createHmac('sha256', SECRET_KEY).update(data).digest('base64url');
+};
+
+const generateSignedUrl = (courseId) => {
+    const data = courseId.toString();
+    return generateSignature(data);
 };
 
 module.exports = {
-  shibbolethAuthentication,
-  teacherConfirmation
+    shibbolethAuthentication,
+    teacherConfirmation,
+    generateSignedUrl,
 };

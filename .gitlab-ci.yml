@@ -1,168 +1,143 @@
 image: docker:stable
 
 stages:
-  - setup
-  - dependency-check
-  - sonarqube-check
-  - test
-  - build
-  - deploy
+    - setup
+    - test
+    - dependency-check
+    - sonarqube-check
+    - build
 
 variables:
-  # When you use the dind service, you must instruct Docker to talk with
-  # the daemon started inside of the service. The daemon is available
-  # with a network connection instead of the default
-  # /var/run/docker.sock socket. Docker 19.03 does this automatically
-  # by setting the DOCKER_HOST in
-  # https://github.com/docker-library/docker/blob/d45051476babc297257df490d22cbd806f1b11e4/19.03/docker-entrypoint.sh#L23-L29
-  #
-  # The 'docker' hostname is the alias of the service container as described at
-  # https://docs.gitlab.com/ee/ci/services/#accessing-the-services.
-  #
-  # Specify to Docker where to create the certificates. Docker
-  # creates them automatically on boot, and creates
-  # `/certs/client` to share between the service and job
-  # container, thanks to volume mount from config.toml
-  DOCKER_TLS_CERTDIR: "/certs"
-  npm_config_cache: "$CI_PROJECT_DIR/.npm"
+    # When you use the dind service, you must instruct Docker to talk with
+    # the daemon started inside of the service. The daemon is available
+    # with a network connection instead of the default
+    # /var/run/docker.sock socket. Docker 19.03 does this automatically
+    # by setting the DOCKER_HOST in
+    # https://github.com/docker-library/docker/blob/d45051476babc297257df490d22cbd806f1b11e4/19.03/docker-entrypoint.sh#L23-L29
+    #
+    # The 'docker' hostname is the alias of the service container as described at
+    # https://docs.gitlab.com/ee/ci/services/#accessing-the-services.
+    #
+    # Specify to Docker where to create the certificates. Docker
+    # creates them automatically on boot, and creates
+    # `/certs/client` to share between the service and job
+    # container, thanks to volume mount from config.toml
+    DOCKER_TLS_CERTDIR: '/certs'
+    npm_config_cache: '$CI_PROJECT_DIR/.npm'
 
 # Define a hidden job to be used with extends
 # Better than default to avoid activating cache for all jobs
 .dependencies_cache:
-  cache:
-    key:
-      files:
-        - package-lock.json
-    paths:
-      - .npm
-    policy: pull
+    cache:
+        key:
+            files:
+                - package-lock.json
+        paths:
+            - .npm
+        policy: pull
 
 services:
-  - docker:dind
+    - docker:dind
 
 sonarqube-check:
-  stage: sonarqube-check
-  tags:
-    - ohtu-build-4
-  image:
-    name: sonarsource/sonar-scanner-cli:latest
-    entrypoint: [ "" ]
-  variables:
-    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
-    GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
-  cache:
-    key: "${CI_JOB_NAME}"
-    paths:
-      - .sonar/cache
-  script:
-    - sonar-scanner
-  allow_failure: true
-  only:
-    - main
-  needs:
-    - job: dependency-check
-      artifacts: true
+    stage: sonarqube-check
+    tags:
+        - ohtu-build-4
+    image:
+        name: sonarsource/sonar-scanner-cli:latest
+        entrypoint: ['']
+    variables:
+        SONAR_USER_HOME: '${CI_PROJECT_DIR}/.sonar' # Defines the location of the analysis task cache
+        GIT_DEPTH: '0' # Tells git to fetch all the branches of the project, required by the analysis task
+    cache:
+        key: '${CI_JOB_NAME}'
+        paths:
+            - .sonar/cache
+    script:
+        - sonar-scanner
+    allow_failure: true
+    only:
+        - main
+    needs:
+        - job: dependency-check
+          artifacts: true
 
 dependency-check:
-  stage: dependency-check
-  only:
-    - main
-  tags:
-    - ohtu-build-4
-  allow_failure: true
-  image:
-    name: owasp/dependency-check-action:latest
-    entrypoint: [""]
-  script:
-    - >
-      /usr/share/dependency-check/bin/dependency-check.sh
-      --project compass-backend --scan . --enableExperimental
-      --format HTML -nvdApiKey $NVD_API_KEY
-  artifacts:
-    when: always
-    expire_in: 1 week
-    paths:
-      - dependency-check-report.html
+    stage: dependency-check
+    only:
+        - main
+    tags:
+        - ohtu-build-4
+    allow_failure: true
+    image:
+        name: owasp/dependency-check-action:latest
+        entrypoint: ['']
+    script:
+        - >
+            /usr/share/dependency-check/bin/dependency-check.sh
+            --project compass-backend --scan . --enableExperimental
+            --format HTML -nvdApiKey $NVD_API_KEY
+    artifacts:
+        when: always
+        expire_in: 1 week
+        paths:
+            - dependency-check-report.html
 
 # Define the process for setup stage
 setup:
-  stage: setup
-  image: quay.io/tike/alpine-oc-node
-  tags:
-    - ohtu-build-4
-  script:
-    - npm ci
-  extends: .dependencies_cache
-  cache:
-    policy: pull-push
-  artifacts:
-    expire_in: 1h
-    paths:
-      - node_modules
+    stage: setup
+    image: quay.io/tike/alpine-oc-node
+    tags:
+        - ohtu-build-4
+    script:
+        - npm ci
+    extends: .dependencies_cache
+    cache:
+        policy: pull-push
+    artifacts:
+        expire_in: 1h
+        paths:
+            - node_modules
 
 test:
-  stage: test
-  image: quay.io/tike/alpine-oc-node
-  tags:
-    - ohtu-build-4
-  script:
-    - npm run coverage
-  extends: .dependencies_cache
+    stage: test
+    image: quay.io/tike/alpine-oc-node
+    tags:
+        - ohtu-build-4
+    script:
+        - npm run coverage
+    extends: .dependencies_cache
 
 build_image:
-  stage: build
-  only:
-    - main
-  tags:
-    - ohtu-build-4
-  script:
-    - echo "Logging into quay..."
-    - echo $QUAY_PASSWORD | docker login -u $QUAY_USERNAME --password-stdin quay.io
-    - echo "Building image..."
-    - docker build -t compass-backend --build-arg NODE_ENV=testing .
-    - echo "Tagging main image..."
-    - docker tag compass-backend quay.io/tike/compass-backend:test
-    - echo "Pushing main image..."
-    - docker push quay.io/tike/compass-backend:test
+    stage: build
+    only:
+        - main
+    tags:
+        - ohtu-build-4
+    script:
+        - echo "Logging into quay..."
+        - echo $QUAY_PASSWORD | docker login -u $QUAY_USERNAME --password-stdin quay.io
+        - echo "Building image..."
+        - docker build -t compass-backend --build-arg NODE_ENV=testing .
+        - echo "Tagging main image..."
+        - docker tag compass-backend quay.io/tike/compass-backend:test
+        - echo "Pushing main image..."
+        - docker push quay.io/tike/compass-backend:test
 
 build_image_caddy:
-  stage: build
-  only:
-    - main
-  tags:
-    - ohtu-build-4
-  script:
-    - echo "Logging into quay..."
-    - echo $QUAY_PASSWORD | docker login -u $QUAY_USERNAME --password-stdin quay.io
-    - echo "Building Compass Caddy image..."
-    - cd caddy
-    - cd test
-    - docker build -t compass-caddy-server .
-    - echo "Tagging Compass Caddy image..."
-    - docker tag compass-caddy-server quay.io/tike/compass-caddy-server:test
-    - echo "Pushing Caddy image..."
-    - docker push quay.io/tike/compass-caddy-server:test
-
-
-deploy_azure:
-  tags:
-    - ohtu-build-4
-  stage: deploy
-  only:
-    - main
-  when: manual
-  image: mcr.microsoft.com/azure-cli:cbl-mariner2.0
-  before_script:
-    - tdnf makecache
-    - tdnf install -y gettext git
-    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@version.helsinki.fi/tike-ohtu/compass-configurations.git
-  script:
-    - az login --service-principal -u $AZURE_USERNAME -p $AZURE_PASSWORD --tenant $AZURE_TENANT_ID
-    - az group create --name Self-Reflection-Compass --location northeurope
-    - cd compass-configurations
-    - envsubst < shibboleth-compass-azure-multi-container.yaml > output.yaml
-    # Delete the existing container group (if exists)
-    - az container delete --name compass-container-group-test --resource-group Self-Reflection-Compass --yes
-    # Create a new container group
-    - az container create --resource-group Self-Reflection-Compass --file output.yaml
-
+    stage: build
+    only:
+        - main
+    tags:
+        - ohtu-build-4
+    script:
+        - echo "Logging into quay..."
+        - echo $QUAY_PASSWORD | docker login -u $QUAY_USERNAME --password-stdin quay.io
+        - echo "Building Compass Caddy image..."
+        - cd caddy
+        - cd test
+        - docker build -t compass-caddy-server .
+        - echo "Tagging Compass Caddy image..."
+        - docker tag compass-caddy-server quay.io/tike/compass-caddy-server:test
+        - echo "Pushing Caddy image..."
+        - docker push quay.io/tike/compass-caddy-server:test
