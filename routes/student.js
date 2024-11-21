@@ -65,14 +65,15 @@ exports.student = (router) => {
 
     router.get('/course/assignment/answer/:course', async (req, res) => {
         const { course } = req.params;
-        const { signature } = req.query;
-        const originalSignature = generateSignedUrl(course);
+        const user = req.user;
+        const { id, signature } = req.query;
+        const originalSignature = generateSignedUrl(id);
         if (signature !== originalSignature) {
             logger.error(`signature not valid for course ${course}, user ${req.user.eppn}`);
             return res.status(401).json({});
         }
         await dbApi.connectusertocourse(req, res);
-        res.json(await dbClient(`/api/student/assignments/course/${course}`));
+        res.json(await dbClient(`/api/student/assignments/course/${user.eppn}/${course}`));
     });
 
     router.post('/deleteAnswer', dbApi.deleteStudentAnswer);
