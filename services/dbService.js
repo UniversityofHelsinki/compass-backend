@@ -38,8 +38,8 @@ exports.saveAnswer = async (req, res) => {
     });
 };
 
-exports.isuserincourse = async (course_id, user_id) => {
-    const url = `${dbHost}/api/isuserincourse/${course_id}/${user_id}`;
+exports.isuserincourse = async (id, user_id, course) => {
+    const url = `${dbHost}/api/isuserincourse/${id}/${user_id}?course_id=${course}`;
     try {
         // Wait for the fetch operation to complete
         const response = await fetch(url, {

@@ -1,6 +1,8 @@
 const dbService = require('../services/dbService');
 const messageKeys = require('../utils/message-keys');
 const { logger } = require('../logger');
+const res = require('express/lib/response');
+const { dbClient } = require('../services/dbService');
 
 exports.getHelloFromDb = async (req, res) => {
     try {
@@ -26,9 +28,9 @@ exports.saveAnswer = async (req, res) => {
     }
 };
 
-const isUserInCourse = async (course_id, user_id) => {
+const isUserInCourse = async (id, user_id, course) => {
     try {
-        return await dbService.isuserincourse(course_id, user_id);
+        return await dbService.isuserincourse(id, user_id, course);
     } catch (error) {
         logger.error(`error checking user in the course`);
         const msg = error.message;
@@ -100,26 +102,35 @@ const userInDatabase = async (user_id) => {
 exports.connectusertocourse = async (req, res) => {
     const { course } = req.params;
     const user_id = req.user.eppn;
+    const { id, signature } = req.query;
     try {
-        let user_exist = await userInDatabase(user_id);
-        if (user_exist?.message === messageKeys.USER_NOT_EXIST) {
+        let response = await userInDatabase(user_id);
+        if (response?.message === messageKeys.USER_NOT_EXIST) {
             logger.error('User not in database', user_id);
             let user_added = await addUser(req.user);
             if (user_added?.message !== messageKeys.USER_ADDED) {
                 logger.error('User NOT added', user_id);
-                return;
+                //return;
             } else {
                 logger.info('User added', user_id);
             }
         } else {
             logger.info('User already in database', user_id);
         }
-        let user_in_course = await isUserInCourse(course, user_id);
-        if (user_in_course?.message === messageKeys.USER_NOT_IN_COURSE) {
+        let user_in_course = await isUserInCourse(id, user_id, course);
+        if (
+            !(user_in_course?.message === messageKeys.COURSE_ONGOING) &&
+            !(user_in_course?.message === messageKeys.USER_IS_IN_COURSE)
+        ) {
+            console.log('COURSE_NOT_ONGOING', user_in_course?.message, user_in_course?.course_date);
+            res.json([user_in_course]);
+            //console.log("COURSE_NOT_ONGOING RESPONSE");
+        } else if (user_in_course?.message === messageKeys.USER_NOT_IN_COURSE) {
             logger.error(`User not in course, USER ${user_id} COURSE ${course}`);
             let user_to_course_added = await addUserToCourse(user_id, course);
             if (user_to_course_added?.message !== messageKeys.USER_ADDED_TO_COURSE) {
                 logger.error(`User NOT added in the course, USER ${user_id} COURSE ${course}`);
+                res.json([failed_to_add_user_to_course]);
             } else {
                 logger.info(`User added in the course, USER ${user_id} COURSE ${course}`);
             }
@@ -131,7 +142,7 @@ exports.connectusertocourse = async (req, res) => {
             `Error POST /connectusertocourse ${error} ${msg}  USER ${req.user.eppn} COURSE ${course}`,
         );
         res.status(500);
-        return res.json([
+        res.json([
             {
                 message: messageKeys.ERROR_MESSAGE_FAILED_TO_ADD_USER_TO_COURSE,
             },

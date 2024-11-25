@@ -2,6 +2,7 @@ const { dbClient } = require('./../services/dbService.js');
 const dbApi = require('../api/dbApi');
 const { generateSignedUrl } = require('../security');
 const { logger } = require('../logger');
+const messageKeys = require('../utils/message-keys');
 
 exports.student = (router) => {
     router.get('/courses', async (req, res) => {
@@ -63,7 +64,7 @@ exports.student = (router) => {
         );
     });
 
-    router.get('/course/assignment/answer/:course', async (req, res) => {
+    router.get('/course/assignment/answer/:course', async (req, res, next) => {
         const { course } = req.params;
         const user = req.user;
         const { id, signature } = req.query;
@@ -73,7 +74,9 @@ exports.student = (router) => {
             return res.status(401).json({});
         }
         await dbApi.connectusertocourse(req, res);
-        res.json(await dbClient(`/api/student/assignments/course/${user.eppn}/${course}`));
+        if (!res.headersSent) {
+            res.json(await dbClient(`/api/student/assignments/course/${user.eppn}/${course}`));
+        }
     });
 
     router.post('/deleteAnswer', dbApi.deleteStudentAnswer);
