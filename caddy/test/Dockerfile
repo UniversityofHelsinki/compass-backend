@@ -1,5 +1,5 @@
 # Use Caddy server image from Dockerhub
-FROM caddy:2.4.5-alpine
+FROM caddy:2.8.4-alpine
 
 # Copy the Caddy configuration file
 COPY Caddyfile /etc/caddy/Caddyfile
