@@ -120,7 +120,8 @@ exports.connectusertocourse = async (req, res) => {
         let user_in_course = await isUserInCourse(id, user_id, course);
         if (
             !(user_in_course?.message === messageKeys.COURSE_ONGOING) &&
-            !(user_in_course?.message === messageKeys.USER_IS_IN_COURSE)
+            !(user_in_course?.message === messageKeys.USER_IS_IN_COURSE) &&
+            !(user_in_course?.message === messageKeys.USER_NOT_IN_COURSE)
         ) {
             console.log('COURSE_NOT_ONGOING', user_in_course?.message, user_in_course?.course_date);
             res.json([user_in_course]);
