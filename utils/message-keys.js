@@ -8,6 +8,8 @@ const ERROR_MESSAGE_USER_EXIST_IN_DATABASE = 'error-user-checking-in-database';
 const USER_EXIST = 'user-is-in-database';
 const USER_NOT_EXIST = 'error-user-not-in-database';
 const COURSE_ONGOING = 'course_ongoing';
+const COURSE_ENDED = 'course_ended';
+const COURSE_IN_FUTURE = 'course_in_future';
 const USER_IS_IN_COURSE = 'user-is-in-course';
 const USER_NOT_IN_COURSE = 'user-not-in-course';
 const ASSIGNMENT_DONE = 'assignment-done';
@@ -27,6 +29,8 @@ module.exports = {
     USER_EXIST,
     USER_NOT_EXIST,
     COURSE_ONGOING,
+    COURSE_ENDED,
+    COURSE_IN_FUTURE,
     USER_IS_IN_COURSE,
     USER_NOT_IN_COURSE,
     ASSIGNMENT_DONE,

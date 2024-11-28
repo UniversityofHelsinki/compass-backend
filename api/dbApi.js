@@ -3,6 +3,7 @@ const messageKeys = require('../utils/message-keys');
 const { logger } = require('../logger');
 const res = require('express/lib/response');
 const { dbClient } = require('../services/dbService');
+const { userAndCourseState } = require('../utils/userAndCourseState');
 
 exports.getHelloFromDb = async (req, res) => {
     try {
@@ -117,16 +118,10 @@ exports.connectusertocourse = async (req, res) => {
         } else {
             logger.info('User already in database', user_id);
         }
+
         let user_in_course = await isUserInCourse(id, user_id, course);
-        if (
-            !(user_in_course?.message === messageKeys.COURSE_ONGOING) &&
-            !(user_in_course?.message === messageKeys.USER_IS_IN_COURSE) &&
-            !(user_in_course?.message === messageKeys.USER_NOT_IN_COURSE)
-        ) {
-            console.log('COURSE_NOT_ONGOING', user_in_course?.message, user_in_course?.course_date);
-            res.json([user_in_course]);
-            //console.log("COURSE_NOT_ONGOING RESPONSE");
-        } else if (user_in_course?.message === messageKeys.USER_NOT_IN_COURSE) {
+        const course_ongoing = userAndCourseState(user_in_course, res);
+        if (course_ongoing) {
             logger.error(`User not in course, USER ${user_id} COURSE ${course}`);
             let user_to_course_added = await addUserToCourse(user_id, course);
             if (user_to_course_added?.message !== messageKeys.USER_ADDED_TO_COURSE) {
