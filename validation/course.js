@@ -99,8 +99,95 @@ const validateNewCourse = async (course) => {
     };
 };
 
+const isOnGoingAssignment = (assignment) => {
+  const today = new Date();
+  return new Date(assignment.start_date) < today && new Date(assignment.end_date) > today;
+};
+
+const isPastAssignment = (assignment) => {
+  const today = new Date();
+  return new Date(assignment.end_date) < today;
+};
+
+const onGoingAssignmentsAreDeleted = (onGoingAssignments, modifiedAssignments) => {
+    const modifiedAssignmentIds = modifiedAssignments.map((ma) => ma.id);
+    for (const onGoingAssignment of onGoingAssignments) {
+        if (!modifiedAssignmentIds.includes(onGoingAssignment.id)) {
+          return true;
+        }
+    }
+    return false;
+};
+
+const onGoingAssignmentTopicsAreChanged = (onGoingAssignments, modifiedAssignments) => {
+  for (const onGoingAssignment of onGoingAssignments) {
+    for (const modifiedAssignment of modifiedAssignments) {
+      if (
+        onGoingAssignment.id === modifiedAssignment.id &&
+        onGoingAssignment.topic !== modifiedAssignment.topic
+      ) {
+        return true;
+      }
+    }
+  }
+  return false;
+};
+
+const onGoingAssignmentDatesAreShortened = (onGoingAssignments, modifiedAssignments) => {
+    for (const onGoingAssignment of onGoingAssignments) {
+        for (const modifiedAssignment of modifiedAssignments) {
+            if (
+                onGoingAssignment.id === modifiedAssignment.id &&
+                (new Date(modifiedAssignment.end_date) < new Date(onGoingAssignment.end_date) ||
+                    new Date(modifiedAssignment.start_date) >
+                        new Date(onGoingAssignment.start_date))
+            ) {
+              return true;
+            }
+        }
+    }
+    return false;
+}
+
+const pastAssignmentsAreDeleted = (pastAssignments, modifiedAssignments) => {
+    const modifiedAssignmentIds = modifiedAssignments.map((ma) => ma.id);
+    for (const pastAssignment of pastAssignments) {
+      if (!modifiedAssignmentIds.includes(pastAssignment.id)) {
+        return true;
+      }
+    }
+    return false;
+};
+
+const pastAssignmentsAreChanged = (pastAssignments, modifiedAssignments) => {
+  for (const pastAssignment of pastAssignments) {
+    for (const modifiedAssignment of modifiedAssignments) {
+      if (pastAssignment.id === modifiedAssignment.id) {
+        if (
+          pastAssignment.topic !== modifiedAssignment.topic ||
+          pastAssignment.start_date !== modifiedAssignment.start_date ||
+          pastAssignment.end_date !== modifiedAssignment.end_date
+        ) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+};
+
+const split = (assignments) => {
+  const onGoingAssignments = assignments.filter(isOnGoingAssignment);
+  const pastAssignments = assignments.filter(isPastAssignment);
+
+  return {
+    onGoingAssignments,
+    pastAssignments
+  };
+};
+
 const validateExistingCourse = async (course, existingCourse) => {
-    if (!existingCourse || !existingCourse.id) {
+    if (!existingCourse?.id) {
         return {
             isValid: false,
             reason: 'course_existing_course_not_found',
@@ -123,82 +210,44 @@ const validateExistingCourse = async (course, existingCourse) => {
     }
 
     const modifiedAssignments = course.assignments;
-    const existingAssignments = existingCourse.assignments;
+    const existingAssignments = split(existingCourse.assignments);
 
-    const isOnGoingAssignment = (assignment) => {
-        const today = new Date();
-        return new Date(assignment.start_date) < today && new Date(assignment.end_date) > today;
-    };
+    const onGoingAssignments = existingAssignments.onGoingAssignments;
 
-    const isPastAssignment = (assignment) => {
-        const today = new Date();
-        return new Date(assignment.end_date) < today;
-    };
-
-    const onGoingAssignments = existingAssignments.filter(isOnGoingAssignment);
-
-    const modifiedAssignmentIds = modifiedAssignments.map((ma) => ma.id);
-    for (const onGoingAssignment of onGoingAssignments) {
-        if (!modifiedAssignmentIds.includes(onGoingAssignment.id)) {
-            return {
-                isValid: false,
-                reason: 'course_assignment_on_going_assignment_can_not_be_deleted',
-            };
-        }
+    if (onGoingAssignmentsAreDeleted(onGoingAssignments, modifiedAssignments)) {
+      return {
+        isValid: false,
+        reason: 'course_assignment_on_going_assignment_can_not_be_deleted',
+      };
     }
 
-    for (const onGoingAssignment of onGoingAssignments) {
-        for (const modifiedAssignment of modifiedAssignments) {
-            if (
-                onGoingAssignment.id === modifiedAssignment.id &&
-                onGoingAssignment.topic !== modifiedAssignment.topic
-            ) {
-                return {
-                    isValid: false,
-                    reason: 'course_assignment_on_going_assignment_topic_can_not_be_changed',
-                };
-            }
-        }
+    if (onGoingAssignmentTopicsAreChanged(onGoingAssignments, modifiedAssignments)) {
+      return {
+        isValid: false,
+        reason: 'course_assignment_on_going_assignment_topic_can_not_be_changed',
+      };
     }
 
-    for (const onGoingAssignment of onGoingAssignments) {
-        for (const modifiedAssignment of modifiedAssignments) {
-            if (
-                onGoingAssignment.id === modifiedAssignment.id &&
-                (new Date(modifiedAssignment.end_date) < new Date(onGoingAssignment.end_date) ||
-                    new Date(modifiedAssignment.start_date) >
-                        new Date(onGoingAssignment.start_date))
-            ) {
-                return {
-                    isValid: false,
-                    reason: 'course_assignment_on_going_assignment_can_not_be_shortened',
-                };
-            }
-        }
+    if (onGoingAssignmentDatesAreShortened(onGoingAssignments, modifiedAssignments)) {
+      return {
+        isValid: false,
+        reason: 'course_assignment_on_going_assignment_can_not_be_shortened',
+      };
     }
 
-    const pastAssignments = existingAssignments.filter(isPastAssignment);
-    for (const pastAssignment of pastAssignments) {
-        if (!modifiedAssignmentIds.includes(pastAssignment.id)) {
-            return {
-                isValid: false,
-                reason: `course_assignment_past_assignment_can_not_be_deleted`,
-            };
-        }
-        for (const modifiedAssignment of modifiedAssignments) {
-            if (pastAssignment.id === modifiedAssignment.id) {
-                if (
-                    pastAssignment.topic !== modifiedAssignment.topic ||
-                    pastAssignment.start_date !== modifiedAssignment.start_date ||
-                    pastAssignment.end_date !== modifiedAssignment.end_date
-                ) {
-                    return {
-                        isValid: false,
-                        reason: 'course_assignment_past_assignment_can_not_be_changed',
-                    };
-                }
-            }
-        }
+    const pastAssignments = existingAssignments.pastAssignments;
+    if (pastAssignmentsAreDeleted(pastAssignments, modifiedAssignments)) {
+      return {
+        isValid: false,
+        reason: `course_assignment_past_assignment_can_not_be_deleted`,
+      };
+    }
+
+    if (pastAssignmentsAreChanged(pastAssignments, modifiedAssignments)) {
+      return {
+        isValid: false,
+        reason: 'course_assignment_past_assignment_can_not_be_changed',
+      };
     }
 
     return {

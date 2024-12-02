@@ -24,14 +24,10 @@ const end_date = (end_date) => {
   }
 };
 
-const course_id = async (course_id) => {
-};
-
 const validations = {
   topic,
   start_date,
-  end_date,
-  course_id
+  end_date
 };
 
 const validate = async (assignment) => {
