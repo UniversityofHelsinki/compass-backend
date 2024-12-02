@@ -154,7 +154,7 @@ build_image_caddy-prod:
         - echo $QUAY_PASSWORD | docker login -u $QUAY_USERNAME --password-stdin quay.io
         - echo "Building Compass Caddy image..."
         - cd caddy
-        - cd test
+        - cd prod
         - docker build -t compass-caddy-server .
         - echo "Tagging Compass Caddy image..."
         - docker tag compass-caddy-server quay.io/tike/compass-caddy-server:prod
