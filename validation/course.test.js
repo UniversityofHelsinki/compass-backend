@@ -30,7 +30,7 @@ const date = (dayOffset = 0, date = new Date()) => {
 module.exports.date = date;
 
 const createAssignment = (course, overrides = {}) => ({
-    id: parseInt(Math.random() * 100),
+    id: parseInt(Math.random() * 100) + 1,
     course_id: course,
     topic: randomLetters(10),
     start_date: date(-30),
@@ -48,7 +48,7 @@ const createAssignments = (course, count) => {
 const createCourse = (overrides = {}) => {
     const course_id = randomLetters(10);
     return {
-        id: parseInt(Math.random() * 100),
+        id: parseInt(Math.random() * 100) + 1,
         course_id,
         title: randomLetters(10),
         description: randomLetters(200),
