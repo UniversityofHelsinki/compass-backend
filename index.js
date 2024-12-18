@@ -8,7 +8,7 @@ const compression = require('compression');
 const security = require('./security');
 const passport = require('passport');
 const cookieParser = require('cookie-parser');
-const cors = require("cors");
+const cors = require('cors');
 const { logger } = require('./logger');
 const { teacher } = require('./routes/teacher.js');
 const { student } = require('./routes/student.js');
@@ -24,14 +24,13 @@ const corsOptions = {
     origin: (origin, callback) => {
         // Ensure origin is allowed or the request is same-origin
         if (origin === allowedOrigin || !origin) {
-            logger.info(`CORS allowed: ${origin}`);
             callback(null, true); // Allow the request
         } else {
             logger.warn(`CORS denied: ${origin}`);
             callback(new Error('Not allowed by CORS')); // Deny the request
         }
     },
-    optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
+    optionsSuccessStatus: 200, // Some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 
 // Apply CORS middleware to the app
