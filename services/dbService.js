@@ -38,6 +38,17 @@ exports.saveAnswer = async (req, res) => {
     });
 };
 
+exports.saveFeedback = async (req, res) => {
+    const url = `/api/student/saveFeedback`;
+    return await dbClient(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(req.body),
+    });
+};
+
 exports.isuserincourse = async (id, user_id, course) => {
     const url = `${dbHost}/api/isuserincourse/${id}/${user_id}?course_id=${course}`;
     try {

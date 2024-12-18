@@ -1,4 +1,5 @@
 const ERROR_MESSAGE_FAILED_TO_SAVE_ANSWER = 'error-failed-to-save-answer';
+const ERROR_MESSAGE_FAILED_TO_SAVE_FEEDBACK = 'error-failed-to-save-feedback';
 const MESSAGE_ANSWER_SAVED = 'answer-saved';
 const ERROR_MESSAGE_FAILED_TO_ADD_USER = 'error-failed-to-add-user';
 const ERROR_MESSAGE_FAILED_TO_ADD_USER_TO_COURSE = 'error-failed-to-add-user-to-course';

@@ -15,7 +15,8 @@ exports.teacher = (router) => {
     router.get('/courses/:course', async (req, res) => {
         const { course } = req.params;
         const user = req.user;
-        res.json(await dbClient(`/api/teacher/courses/${user.eppn}/${course}`));
+        const result = await dbClient(`/api/teacher/courses/${user.eppn}/${course}`);
+        res.json(result);
     });
 
     router.post('/courses', async (req, res) => {
@@ -109,5 +110,10 @@ exports.teacher = (router) => {
     router.get('/assignment/:assignmentId/answers', async (req, res) => {
         const assignmentId = req.params.assignmentId;
         res.json(await dbClient(`/api/teacher/assignment/${assignmentId}/answers`));
+    });
+
+    router.get('/assignment/:assignmentId/answersAndFeedbacks', async (req, res) => {
+        const assignmentId = req.params.assignmentId;
+        res.json(await dbClient(`/api/teacher/assignment/${assignmentId}/answersAndFeedbacks`));
     });
 };

@@ -29,6 +29,23 @@ exports.saveAnswer = async (req, res) => {
     }
 };
 
+exports.saveFeedback = async (req, res) => {
+    console.log('feedback:', req.body);
+    //return  res.json(req.body);
+    try {
+        const response = await dbService.saveFeedback(req, res);
+        res.json(response);
+    } catch (error) {
+        console.error(`Error POST /saveAnswer ${error} USER ${req.user.eppn}`);
+        res.status(500);
+        return res.json([
+            {
+                message: messageKeys.ERROR_MESSAGE_FAILED_TO_SAVE_FEEDBACK,
+            },
+        ]);
+    }
+};
+
 const isUserInCourse = async (id, user_id, course) => {
     try {
         return await dbService.isuserincourse(id, user_id, course);
