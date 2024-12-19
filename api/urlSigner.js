@@ -8,3 +8,7 @@ exports.getUrlSignature = async (req, res) => {
         res.status(500);
     }
 };
+
+exports.signatures = (courses) => {
+  return courses.reduce((signatures, course) => ({ [course]: generateSignedUrl(course), ...signatures }), {});
+};
