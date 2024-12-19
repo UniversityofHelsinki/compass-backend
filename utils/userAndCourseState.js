@@ -1,14 +1,11 @@
 const messageKeys = require('../utils/message-keys');
 const courseInFuture = (user_in_course, res) => {
-    console.log('COURSE_IN_FUTURE', user_in_course?.message, user_in_course?.course_date);
     res.json([user_in_course]);
 };
 const courseEnded = (user_in_course, res) => {
-    console.log('COURSE_ENDED', user_in_course?.message, user_in_course?.course_date);
     res.json([user_in_course]);
 };
 const courseOngoing = (user_in_course, res) => {
-    console.log('COURSE_ONGOING', user_in_course?.message, user_in_course?.course_date);
     return true;
 };
 const courseState = [
