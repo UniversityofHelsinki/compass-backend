@@ -14,4 +14,8 @@ module.exports = function (router) {
     router.post('/addcourse', dbApi.addcourse);
     router.get('/logout', userApi.logout);
     router.get('/getUrlSignature/:courseId', urlSigner.getUrlSignature);
+    router.get('/signatures/:courses', async (req, res) => {
+      const courses = (req.params.courses || '').split(',');
+      res.json(urlSigner.signatures(courses));
+    });
 };
