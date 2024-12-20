@@ -8,6 +8,7 @@ module.exports = function (router) {
     router.get('/hello', dbApi.getHelloFromDb);
     router.get('/user', userApi.getLoggedUser);
     router.post('/saveAnswer', dbApi.saveAnswer);
+    router.post('/saveFeedback', dbApi.saveFeedback);
     //router.get('/isuserincourse/:course_id', dbApi.isuserincourse);
     router.get('/userExist', dbApi.userExist);
     router.post('/addcourse', dbApi.addcourse);
