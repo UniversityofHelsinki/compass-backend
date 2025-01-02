@@ -116,4 +116,15 @@ exports.teacher = (router) => {
         const assignmentId = req.params.assignmentId;
         res.json(await dbClient(`/api/teacher/assignment/${assignmentId}/answersAndFeedbacks`));
     });
+
+    router.get('/courses/:courseId/student/:studentId/assignments', async (req, res) => {
+        const { courseId, studentId } = req.params;
+        const course = await dbClient(`/api/student/course/${courseId}`);
+        const user = await dbClient(`/api/teacher/studentNameForId/${studentId}`);
+        res.json(
+            await dbClient(
+                `/api/student/courses/${course?.course_id}/assignments/${user?.user_name}`,
+            ),
+        );
+    });
 };
