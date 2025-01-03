@@ -15,6 +15,11 @@ exports.student = (router) => {
         res.json(await dbClient(`/api/student/studentCourses/${user.eppn}`));
     });
 
+    router.get('/studentsInCourse/:course_id', async (req, res) => {
+        const course_id = req.params.course_id;
+        res.json(await dbClient(`/api/student/studentsInCourse/${course_id}`));
+    });
+
     router.get('/courses/:course/assignments', async (req, res) => {
         const { course } = req.params;
         const user = req.user;
