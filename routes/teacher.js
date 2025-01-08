@@ -127,4 +127,15 @@ exports.teacher = (router) => {
             ),
         );
     });
+
+    router.delete('/deleteUserFromCourse', async (req, res) => {
+        await dbClient(`/api/teacher/deleteUserFromCourse`, {
+            method: 'DELETE',
+            body: JSON.stringify({ ...req.body }),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        res.status(200).end();
+    });
 };
