@@ -35,7 +35,12 @@ const corsOptions = {
 
 // Apply CORS middleware to the app
 app.use(cors(corsOptions));
-app.use(helmet());
+app.use(
+    helmet({
+        contentSecurityPolicy: false, // Disable CSP in Helmet
+    }),
+);
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
