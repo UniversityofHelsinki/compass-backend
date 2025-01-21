@@ -46,21 +46,19 @@ app.use(
     helmet({
         contentSecurityPolicy: {
             directives: {
-                defaultSrc: ["'self'"],
-                scriptSrc: ["'self'", (req, res) => `'nonce-${res.locals.cspNonce}'`],
-                styleSrc: ["'self'", 'https:', (req, res) => `'nonce-${res.locals.cspNonce}'`],
-                imgSrc: ["'self'", 'https:', 'data:'],
-                connectSrc: ["'self'", 'https:'],
-                fontSrc: ["'self'", 'https:', 'data:'],
-                mediaSrc: ["'self'", 'https:'],
-                objectSrc: ["'none'"],
-                frameSrc: ["'none'"],
-                frameAncestors: ["'self'"],
-                formAction: ["'self'"],
-                manifestSrc: ["'self'"],
-                baseUri: ["'self'"],
-                upgradeInsecureRequests: [],
-                requireTrustedTypesFor: ["'script'"],
+                defaultSrc: ["'none'"], // Block everything by default
+                scriptSrc: ["'none'"], // No scripts allowed
+                styleSrc: ["'none'"], // No styles allowed
+                imgSrc: ["'none'"], // No images served
+                connectSrc: ["'self'"], // Allow only same-origin API calls
+                fontSrc: ["'none'"], // Fonts not needed
+                mediaSrc: ["'none'"], // No media files (audio/video)
+                objectSrc: ["'none'"], // Block <object> elements
+                frameSrc: ["'none'"], // Block iframes (embedding other sites)
+                frameAncestors: ["'none'"], // Prevent this app from being embedded in frames
+                formAction: ["'none'"], // Prevent form submissions
+                manifestSrc: ["'none'"], // No manifests needed
+                baseUri: ["'none'"], // Prevent <base> tag hijacking
             },
         },
     }),
