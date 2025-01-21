@@ -35,9 +35,33 @@ const corsOptions = {
 
 // Apply CORS middleware to the app
 app.use(cors(corsOptions));
+
+app.use((req, res, next) => {
+    res.locals.cspNonce = crypto.randomBytes(16).toString('base64'); // Recommended
+    next();
+});
+
 app.use(
     helmet({
-        contentSecurityPolicy: false, // Disable CSP in Helmet
+        contentSecurityPolicy: {
+            directives: {
+                defaultSrc: ["'self'"],
+                scriptSrc: ["'self'", (req, res) => `'nonce-${res.locals.cspNonce}'`],
+                styleSrc: ["'self'", 'https:', (req, res) => `'nonce-${res.locals.cspNonce}'`],
+                imgSrc: ["'self'", 'https:', 'data:'],
+                connectSrc: ["'self'", 'https:'],
+                fontSrc: ["'self'", 'https:', 'data:'],
+                mediaSrc: ["'self'", 'https:'],
+                objectSrc: ["'none'"],
+                frameSrc: ["'none'"],
+                frameAncestors: ["'self'"],
+                formAction: ["'self'"],
+                manifestSrc: ["'self'"],
+                baseUri: ["'self'"],
+                upgradeInsecureRequests: [],
+                requireTrustedTypesFor: ["'script'"],
+            },
+        },
     }),
 );
 
