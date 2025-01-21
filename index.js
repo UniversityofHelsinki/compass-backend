@@ -12,6 +12,7 @@ const cors = require('cors');
 const { logger } = require('./logger');
 const { teacher } = require('./routes/teacher.js');
 const { student } = require('./routes/student.js');
+const crypto = require('crypto');
 
 const ipaddress = process.env.AZURE_NODEJS_IP || 'localhost';
 
