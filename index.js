@@ -12,6 +12,7 @@ const cors = require('cors');
 const { logger } = require('./logger');
 const { teacher } = require('./routes/teacher.js');
 const { student } = require('./routes/student.js');
+const crypto = require('crypto');
 
 const ipaddress = process.env.AZURE_NODEJS_IP || 'localhost';
 
@@ -35,7 +36,34 @@ const corsOptions = {
 
 // Apply CORS middleware to the app
 app.use(cors(corsOptions));
-app.use(helmet());
+
+app.use((req, res, next) => {
+    res.locals.cspNonce = crypto.randomBytes(16).toString('base64'); // Recommended
+    next();
+});
+
+app.use(
+    helmet({
+        contentSecurityPolicy: {
+            directives: {
+                defaultSrc: ["'none'"], // Block everything by default
+                scriptSrc: ["'none'"], // No scripts allowed
+                styleSrc: ["'none'"], // No styles allowed
+                imgSrc: ["'none'"], // No images served
+                connectSrc: ["'self'"], // Allow only same-origin API calls
+                fontSrc: ["'none'"], // Fonts not needed
+                mediaSrc: ["'none'"], // No media files (audio/video)
+                objectSrc: ["'none'"], // Block <object> elements
+                frameSrc: ["'none'"], // Block iframes (embedding other sites)
+                frameAncestors: ["'none'"], // Prevent this app from being embedded in frames
+                formAction: ["'none'"], // Prevent form submissions
+                manifestSrc: ["'none'"], // No manifests needed
+                baseUri: ["'none'"], // Prevent <base> tag hijacking
+            },
+        },
+    }),
+);
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
