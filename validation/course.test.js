@@ -85,7 +85,7 @@ describe.each([[createCourse()]])('Course validation', (course) => {
         test('Too long title causes invalidity', async () => {
             expect((await validate({ ...course, title: randomLetters(100) })).isValid).toBeFalsy();
             expect((await validate({ ...course, title: randomLetters(100) })).reason).toEqual(
-                'course_title_too_long',
+                'teacher_form_title_is_too_long',
             );
         });
     });
@@ -94,7 +94,7 @@ describe.each([[createCourse()]])('Course validation', (course) => {
         test('Nonexistence of course_id causes invalidity', async () => {
             expect((await validate({ ...course, course_id: null })).isValid).toBeFalsy();
             expect((await validate({ ...course, course_id: null })).reason).toEqual(
-                'course_course_id_missing',
+                'teacher_form_course_id_can_not_be_empty',
             );
         });
 
@@ -103,7 +103,7 @@ describe.each([[createCourse()]])('Course validation', (course) => {
                 (await validate({ ...course, course_id: randomLetters(200) })).isValid,
             ).toBeFalsy();
             expect((await validate({ ...course, course_id: randomLetters(200) })).reason).toEqual(
-                'course_course_id_too_long',
+                'teacher_form_course_id_too_long',
             );
         });
 
@@ -154,7 +154,7 @@ describe.each([[createCourse()]])('Course validation', (course) => {
             expect(
                 (await validate({ ...course, start_date: date(1, new Date(course.end_date)) }))
                     .reason,
-            ).toEqual('course_start_date_after_end_date');
+            ).toEqual('teacher_form_start_date_after_end_date');
         });
 
         test('invalid date string causes invalidity', async () => {
