@@ -5,7 +5,7 @@ const title = (title) => {
     if (!title) {
         return 'course_title_missing';
     } else if (title.length > 50) {
-        return 'course_title_too_long';
+        return 'teacher_form_title_is_too_long';
     }
 };
 
@@ -26,9 +26,9 @@ const course_id = async (course_id, course) => {
     };
 
     if (!course_id) {
-        return 'course_course_id_missing';
+        return 'teacher_form_course_id_can_not_be_empty';
     } else if (course_id.length > 20) {
-        return 'course_course_id_too_long';
+        return 'teacher_form_course_id_too_long';
     } else if (await alreadyInUse()) {
         return 'course_course_id_already_in_use';
     }
@@ -67,7 +67,7 @@ const validate = async (course) => {
     if (new Date(course.start_date) > new Date(course.end_date)) {
         return {
             isValid: false,
-            reason: 'course_start_date_after_end_date',
+            reason: 'teacher_form_start_date_after_end_date',
         };
     }
 
@@ -100,37 +100,37 @@ const validateNewCourse = async (course) => {
 };
 
 const isOnGoingAssignment = (assignment) => {
-  const today = new Date();
-  return new Date(assignment.start_date) < today && new Date(assignment.end_date) > today;
+    const today = new Date();
+    return new Date(assignment.start_date) < today && new Date(assignment.end_date) > today;
 };
 
 const isPastAssignment = (assignment) => {
-  const today = new Date();
-  return new Date(assignment.end_date) < today;
+    const today = new Date();
+    return new Date(assignment.end_date) < today;
 };
 
 const onGoingAssignmentsAreDeleted = (onGoingAssignments, modifiedAssignments) => {
     const modifiedAssignmentIds = modifiedAssignments.map((ma) => ma.id);
     for (const onGoingAssignment of onGoingAssignments) {
         if (!modifiedAssignmentIds.includes(onGoingAssignment.id)) {
-          return true;
+            return true;
         }
     }
     return false;
 };
 
 const onGoingAssignmentTopicsAreChanged = (onGoingAssignments, modifiedAssignments) => {
-  for (const onGoingAssignment of onGoingAssignments) {
-    for (const modifiedAssignment of modifiedAssignments) {
-      if (
-        onGoingAssignment.id === modifiedAssignment.id &&
-        onGoingAssignment.topic !== modifiedAssignment.topic
-      ) {
-        return true;
-      }
+    for (const onGoingAssignment of onGoingAssignments) {
+        for (const modifiedAssignment of modifiedAssignments) {
+            if (
+                onGoingAssignment.id === modifiedAssignment.id &&
+                onGoingAssignment.topic !== modifiedAssignment.topic
+            ) {
+                return true;
+            }
+        }
     }
-  }
-  return false;
+    return false;
 };
 
 const onGoingAssignmentDatesAreShortened = (onGoingAssignments, modifiedAssignments) => {
@@ -142,48 +142,48 @@ const onGoingAssignmentDatesAreShortened = (onGoingAssignments, modifiedAssignme
                     new Date(modifiedAssignment.start_date) >
                         new Date(onGoingAssignment.start_date))
             ) {
-              return true;
+                return true;
             }
         }
     }
     return false;
-}
+};
 
 const pastAssignmentsAreDeleted = (pastAssignments, modifiedAssignments) => {
     const modifiedAssignmentIds = modifiedAssignments.map((ma) => ma.id);
     for (const pastAssignment of pastAssignments) {
-      if (!modifiedAssignmentIds.includes(pastAssignment.id)) {
-        return true;
-      }
+        if (!modifiedAssignmentIds.includes(pastAssignment.id)) {
+            return true;
+        }
     }
     return false;
 };
 
 const pastAssignmentsAreChanged = (pastAssignments, modifiedAssignments) => {
-  for (const pastAssignment of pastAssignments) {
-    for (const modifiedAssignment of modifiedAssignments) {
-      if (pastAssignment.id === modifiedAssignment.id) {
-        if (
-          pastAssignment.topic !== modifiedAssignment.topic ||
-          pastAssignment.start_date !== modifiedAssignment.start_date ||
-          pastAssignment.end_date !== modifiedAssignment.end_date
-        ) {
-          return true;
+    for (const pastAssignment of pastAssignments) {
+        for (const modifiedAssignment of modifiedAssignments) {
+            if (pastAssignment.id === modifiedAssignment.id) {
+                if (
+                    pastAssignment.topic !== modifiedAssignment.topic ||
+                    pastAssignment.start_date !== modifiedAssignment.start_date ||
+                    pastAssignment.end_date !== modifiedAssignment.end_date
+                ) {
+                    return true;
+                }
+            }
         }
-      }
     }
-  }
-  return false;
+    return false;
 };
 
 const split = (assignments) => {
-  const onGoingAssignments = assignments.filter(isOnGoingAssignment);
-  const pastAssignments = assignments.filter(isPastAssignment);
+    const onGoingAssignments = assignments.filter(isOnGoingAssignment);
+    const pastAssignments = assignments.filter(isPastAssignment);
 
-  return {
-    onGoingAssignments,
-    pastAssignments
-  };
+    return {
+        onGoingAssignments,
+        pastAssignments,
+    };
 };
 
 const validateExistingCourse = async (course, existingCourse) => {
@@ -215,39 +215,39 @@ const validateExistingCourse = async (course, existingCourse) => {
     const onGoingAssignments = existingAssignments.onGoingAssignments;
 
     if (onGoingAssignmentsAreDeleted(onGoingAssignments, modifiedAssignments)) {
-      return {
-        isValid: false,
-        reason: 'course_assignment_on_going_assignment_can_not_be_deleted',
-      };
+        return {
+            isValid: false,
+            reason: 'course_assignment_on_going_assignment_can_not_be_deleted',
+        };
     }
 
     if (onGoingAssignmentTopicsAreChanged(onGoingAssignments, modifiedAssignments)) {
-      return {
-        isValid: false,
-        reason: 'course_assignment_on_going_assignment_topic_can_not_be_changed',
-      };
+        return {
+            isValid: false,
+            reason: 'course_assignment_on_going_assignment_topic_can_not_be_changed',
+        };
     }
 
     if (onGoingAssignmentDatesAreShortened(onGoingAssignments, modifiedAssignments)) {
-      return {
-        isValid: false,
-        reason: 'course_assignment_on_going_assignment_can_not_be_shortened',
-      };
+        return {
+            isValid: false,
+            reason: 'course_assignment_on_going_assignment_can_not_be_shortened',
+        };
     }
 
     const pastAssignments = existingAssignments.pastAssignments;
     if (pastAssignmentsAreDeleted(pastAssignments, modifiedAssignments)) {
-      return {
-        isValid: false,
-        reason: `course_assignment_past_assignment_can_not_be_deleted`,
-      };
+        return {
+            isValid: false,
+            reason: `course_assignment_past_assignment_can_not_be_deleted`,
+        };
     }
 
     if (pastAssignmentsAreChanged(pastAssignments, modifiedAssignments)) {
-      return {
-        isValid: false,
-        reason: 'course_assignment_past_assignment_can_not_be_changed',
-      };
+        return {
+            isValid: false,
+            reason: 'course_assignment_past_assignment_can_not_be_changed',
+        };
     }
 
     return {
