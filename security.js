@@ -63,13 +63,17 @@ const shibbolethAuthentication = (app, passport) => {
     app.use(passport.initialize());
 
     app.use((req, res, next) => {
-        passport.authenticate('reverseproxy', { session: false }, (err, user, info) => {
-            if (err || !user) {
-                return res.status(401).send('Not Authorized');
-            }
-            req.user = decodeUser(user);
+        if (req.path === '/api/hello') {
             next();
-        })(req, res, next);
+        } else {
+            passport.authenticate('reverseproxy', { session: false }, (err, user, info) => {
+                if (err || !user) {
+                    return res.status(401).send('Not Authorized');
+                }
+                req.user = decodeUser(user);
+                next();
+            })(req, res, next);
+        }
     });
 };
 
