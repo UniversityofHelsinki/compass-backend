@@ -63,6 +63,7 @@ const shibbolethAuthentication = (app, passport) => {
     app.use(passport.initialize());
 
     app.use((req, res, next) => {
+        console.log(req.path);
         if (req.path === '/api/hello') {
             next();
         } else {
