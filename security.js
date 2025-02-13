@@ -63,6 +63,8 @@ const shibbolethAuthentication = (app, passport) => {
     app.use(passport.initialize());
 
     app.use((req, res, next) => {
+        console.log(process.env.NODE_ENV);
+
         // Get the X-Forwarded-For header
         const xForwardedFor = req.headers['x-forwarded-for'];
 

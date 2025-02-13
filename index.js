@@ -67,6 +67,11 @@ app.use(
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+// Enable 'trust proxy' only if the app is running in production
+if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', true);
+}
+
 security.shibbolethAuthentication(app, passport);
 
 const router = express.Router();
