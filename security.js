@@ -63,32 +63,26 @@ const shibbolethAuthentication = (app, passport) => {
     app.use(passport.initialize());
 
     app.use((req, res, next) => {
-        console.log(req.path);
-        if (req.path === '/api/hello') {
-            // Get the X-Forwarded-For header
-            const xForwardedFor = req.headers['x-forwarded-for'];
+        // Get the X-Forwarded-For header
+        const xForwardedFor = req.headers['x-forwarded-for'];
 
-            // If the header exists, extract the client IP
-            if (xForwardedFor) {
-                console.log(`X-Forwarded-For: ${xForwardedFor}`);
-            } else {
-                console.log(`No X-Forwarded-For header found`);
-            }
-
-            // Detect the actual client IP (if behind a proxy)
-            const clientIp = xForwardedFor ? xForwardedFor.split(',')[0] : req.ip;
-            console.log(`Detected Client IP: ${clientIp}`);
-
-            next();
+        // If the header exists, extract the client IP
+        if (xForwardedFor) {
+            console.log(`X-Forwarded-For: ${xForwardedFor}`);
         } else {
-            passport.authenticate('reverseproxy', { session: false }, (err, user, info) => {
-                if (err || !user) {
-                    return res.status(401).send('Not Authorized');
-                }
-                req.user = decodeUser(user);
-                next();
-            })(req, res, next);
+            console.log(`No X-Forwarded-For header found`);
         }
+
+        // Detect the actual client IP (if behind a proxy)
+        const clientIp = xForwardedFor ? xForwardedFor.split(',')[0] : req.ip;
+        console.log(`Detected Client IP: ${clientIp}`);
+        passport.authenticate('reverseproxy', { session: false }, (err, user, info) => {
+            if (err || !user) {
+                return res.status(401).send('Not Authorized');
+            }
+            req.user = decodeUser(user);
+            next();
+        })(req, res, next);
     });
 };
 
