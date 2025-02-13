@@ -77,7 +77,8 @@ const shibbolethAuthentication = (app, passport) => {
 
         // Detect the actual client IP (if behind a proxy)
         const clientIp = xForwardedFor ? xForwardedFor.split(',')[0] : req.ip;
-        console.log(`Detected Client IP: ${clientIp}`);
+        console.log(`Detected xForwardedFor Client IP: ${clientIp}`);
+        console.log(`Detected req.ip Client IP: ${req.ip}`);
         passport.authenticate('reverseproxy', { session: false }, (err, user, info) => {
             if (err || !user) {
                 return res.status(401).send('Not Authorized');
