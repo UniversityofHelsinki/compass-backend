@@ -92,4 +92,24 @@ exports.student = (router) => {
     });
 
     router.post('/deleteAnswer', dbApi.deleteStudentAnswer);
+
+    router.put('/updateResearchAuthorization', async (req, res) => {
+        res.json(
+            await dbClient(`/api/student/updateResearchAuthorization`, {
+                method: 'PUT',
+                body: JSON.stringify({ ...req.body }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }),
+        );
+    });
+
+    router.get('/userCourse/:course_id', async (req, res) => {
+        const user = req.user;
+        const { course_id } = req.params;
+        console.log('userCourse', course_id, user.eppn);
+        const result = await dbClient(`/api/student/userCourse/${user.eppn}/${course_id}`);
+        res.json(result);
+    });
 };
