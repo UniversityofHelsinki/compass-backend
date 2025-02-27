@@ -18,6 +18,7 @@ const USER_ADDED = 'user-added';
 const USER_ADDED_TO_COURSE = 'user-added-to-course';
 const ADDED_COURSE = 'course-added';
 const ERROR_MESSAGE_FAILED_TO_GET_COURSE_ANSWERS = 'error-failed-to-get-course-answers-for-user';
+const RESEARCH_AUTHORIZATION_MISSING = 'error_research_authorization_missing';
 
 module.exports = {
     ERROR_MESSAGE_FAILED_TO_SAVE_ANSWER,
@@ -39,4 +40,5 @@ module.exports = {
     USER_ADDED_TO_COURSE,
     ADDED_COURSE,
     ERROR_MESSAGE_FAILED_TO_GET_COURSE_ANSWERS,
+    RESEARCH_AUTHORIZATION_MISSING,
 };
