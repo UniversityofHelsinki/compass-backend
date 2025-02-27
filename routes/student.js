@@ -3,6 +3,7 @@ const dbApi = require('../api/dbApi');
 const { generateSignedUrl } = require('../security');
 const { logger } = require('../logger');
 const messageKeys = require('../utils/message-keys');
+const res = require('express/lib/response');
 
 exports.student = (router) => {
     router.get('/courses', async (req, res) => {
@@ -94,6 +95,14 @@ exports.student = (router) => {
     router.post('/deleteAnswer', dbApi.deleteStudentAnswer);
 
     router.put('/updateResearchAuthorization', async (req, res) => {
+        const course = req.body;
+        if (
+            course?.userCourse?.research_authorization == null ||
+            course?.userCourse?.research_authorization === undefined
+        ) {
+            return res.status(500).json({ reason: messageKeys.RESEARCH_AUTHORIZATION_MISSING });
+        }
+
         res.json(
             await dbClient(`/api/student/updateResearchAuthorization`, {
                 method: 'PUT',
