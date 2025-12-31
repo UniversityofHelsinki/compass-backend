@@ -41,7 +41,7 @@ variables:
         policy: pull
 
 services:
-    - docker:dind
+    - docker:28.5.0-dind
 
 generate-sbom:
     stage: dependency-track-sbom
