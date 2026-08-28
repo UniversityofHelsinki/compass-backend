@@ -86,13 +86,15 @@ const shibbolethAuthentication = (app, passport) => {
  * @param {Function} next - The next middleware function in the stack.
  */
 const teacherConfirmation = (req, res, next) => {
-    const user = req.user;
-    const isTeacher = user.eduPersonAffiliation.includes(constants.ROLE_TEACHER);
+    const isTeacher = req.user?.eduPersonAffiliation?.some((role) =>
+        constants.ROLE_TEACHER.includes(role),
+    );
+
     if (!isTeacher) {
-        res.status(403).json('User is not a teacher.');
-    } else {
-        next();
+        return res.status(403).json('User is not a teacher.');
     }
+
+    next();
 };
 
 const generateSignature = (data) => {
