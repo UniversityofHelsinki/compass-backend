@@ -1,5 +1,5 @@
-const ROLE_TEACHER = 'faculty';
+const ROLE_TEACHER = ['affiliate', 'faculty'];
 
 module.exports = {
-    ROLE_TEACHER
+    ROLE_TEACHER,
 };
